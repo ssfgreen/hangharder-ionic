@@ -1,30 +1,43 @@
 import type { NextPage } from 'next';
 import { trpc } from '../utils/trpc';
+import { useSession } from 'next-auth/react';
 
-const Exercise: NextPage = () => {
-  // const { data: exercise, isLoading } = trpc.exercise.getById.useQuery(
-  //   'clao4h9kd0000ovzwxsko9gg6'
-  // );
+interface ExerciseProps {
+  title: string;
+  summary: string;
+  author: string | null;
+  exId: string;
+}
 
-  const { data: exercises, isLoading } = trpc.exercise.getAll.useQuery();
+const Exercise: NextPage<ExerciseProps> = (props) => {
+  const { data: session, status } = useSession();
 
-  console.log(exercises);
+  console.log('exercise session', session);
+  console.log('props', props);
+  const mutation = trpc.log.insertOne.useMutation();
 
-  if (isLoading) return <div>Loading...</div>;
+  const handleLog = async () => {
+    session?.user?.id &&
+      mutation.mutate({
+        exerciseId: props.exId,
+        userId: session.user.id,
+        comment: 'I did it!'
+      });
+  };
 
-  const Exercises = exercises
-    ? exercises.map((exercise, i) => {
-        return (
-          <div key={i} className="border p-2">
-            <h1>{exercise.title}</h1>
-            <p>{exercise.summary}</p>
-            <p>By {exercise.author.name}</p>
-          </div>
-        );
-      })
-    : null;
-
-  return <main>{Exercises}</main>;
+  return (
+    <div className="border p-2">
+      <h1>{props.title}</h1>
+      <p>{props.summary}</p>
+      <p>By {props.author}</p>
+      <button onClick={handleLog}>Log Exercise</button>
+      {mutation.error && (
+        <p className="text-red">
+          Something went wrong! {mutation.error.message}
+        </p>
+      )}
+    </div>
+  );
 };
 
 export default Exercise;

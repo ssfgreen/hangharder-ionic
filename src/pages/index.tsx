@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import Exercise from '../components/exercise';
-import { trpc } from '../utils/trpc';
+import Exercises from '../components/exercises';
 
 const Home: NextPage = () => {
   const { data: session, status } = useSession();
@@ -16,7 +15,7 @@ const Home: NextPage = () => {
         <div>
           <p>hi {session.user?.name}</p>
           <button onClick={() => signOut()}>Logout</button>
-          <Exercise />
+          <Exercises />
         </div>
       ) : (
         <div>
