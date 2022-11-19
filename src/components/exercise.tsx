@@ -12,7 +12,19 @@ const Exercise: NextPage = () => {
 
   if (isLoading) return <div>Loading...</div>;
 
-  return <main>{exercises && exercises[0] && exercises[0].title}</main>;
+  const Exercises = exercises
+    ? exercises.map((exercise, i) => {
+        return (
+          <div key={i} className="border p-2">
+            <h1>{exercise.title}</h1>
+            <p>{exercise.summary}</p>
+            <p>By {exercise.author.name}</p>
+          </div>
+        );
+      })
+    : null;
+
+  return <main>{Exercises}</main>;
 };
 
 export default Exercise;
