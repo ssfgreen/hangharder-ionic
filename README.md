@@ -26,6 +26,8 @@ Also checkout these awesome tutorials on `create-t3-app`.
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
 
-## Prettier
+## Prettier and EsLint
+
+Followed the tutorials on [Es](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/) and [Prettier](https://khalilstemmler.com/blogs/tooling/prettier/) for Typescript.
 
 `npm run prettier-format` to run prettier on all files
