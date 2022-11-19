@@ -31,3 +31,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 Followed the tutorials on [Es](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/) and [Prettier](https://khalilstemmler.com/blogs/tooling/prettier/) for Typescript.
 
 `npm run prettier-format` to run prettier on all files
+
+## Prisma Studio
+
+`npx prisma studio` to open the Prisma Studio
