@@ -17,10 +17,7 @@ const Exercise: NextPage<ExerciseProps> = (props) => {
 
   const timerKeys = ['repDuration', 'reps', 'sets', 'repsRest', 'setsRest'];
   const timerAvailable =
-    exercise &&
-    timerKeys.every(
-      (key) => Object.keys(exercise).includes(key) && exercise[key] !== null
-    );
+    exercise && timerKeys.every((key) => exercise[key] !== null);
 
   return exercise ? (
     <div className="border p-2">
@@ -30,11 +27,11 @@ const Exercise: NextPage<ExerciseProps> = (props) => {
       <Log id={props.id} />
       {timerAvailable && (
         <Timer
-          repDuration={exercise.repDuration}
-          reps={exercise.reps}
-          sets={exercise.sets}
-          repsRest={exercise.repsRest}
-          setsRest={exercise.setsRest}
+          repDuration={exercise.repDuration as number}
+          reps={exercise.reps as number}
+          sets={exercise.sets as number}
+          repsRest={exercise.repsRest as number}
+          setsRest={exercise.setsRest as number}
         ></Timer>
       )}
     </div>

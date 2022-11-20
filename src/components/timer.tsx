@@ -16,6 +16,7 @@ const Timer: NextPage<TimerProps> = (props) => {
   const [started, setStarted] = React.useState(false);
   const [repRest, setRepRest] = React.useState(false);
   const [setRest, setSetRest] = React.useState(false);
+  const [locationChanged, setLocationChanged] = React.useState(false);
   const [countdown, setCountdown] = React.useState(false);
   const [playing, setPlaying] = React.useState(false);
   const [timer, setTimer] = React.useState(0);
@@ -62,11 +63,18 @@ const Timer: NextPage<TimerProps> = (props) => {
     setSetRest(false);
   };
 
+  const resetOnLocationChange = () => {
+    setTimer(0);
+    setPlaying(false);
+    setRepRest(false);
+    setSetRest(false);
+    setLocationChanged(true);
+  };
+
   const adjustRep = (increment: number) => {
     if (currentRep + increment <= props.reps && currentRep + increment > 0) {
       setCurrentRep(currentRep + increment);
-      setTimer(0);
-      setPlaying(false);
+      resetOnLocationChange();
     }
     if (
       increment > 0 &&
@@ -75,6 +83,7 @@ const Timer: NextPage<TimerProps> = (props) => {
     ) {
       setCurrentRep(1);
       setCurrentSet(currentSet + increment);
+      resetOnLocationChange();
     }
     if (
       increment < 0 &&
@@ -83,6 +92,7 @@ const Timer: NextPage<TimerProps> = (props) => {
     ) {
       setCurrentRep(props.reps);
       setCurrentSet(currentSet + increment);
+      resetOnLocationChange();
     }
   };
 
@@ -90,8 +100,7 @@ const Timer: NextPage<TimerProps> = (props) => {
     if (currentSet + increment <= props.sets && currentSet + increment > 0) {
       setCurrentSet(currentSet + increment);
       setCurrentRep(1);
-      setTimer(0);
-      setPlaying(false);
+      resetOnLocationChange();
     }
   };
 
@@ -120,6 +129,9 @@ const Timer: NextPage<TimerProps> = (props) => {
       } else if (countdown) {
         setCountdown(false);
         setTimer(props.repDuration * 1000);
+      } else if (timer === 0 && locationChanged) {
+        setLocationChanged(false);
+        setTimer(props.repDuration * 1000);
       } else if (timer === 0 && (repRest || setRest)) {
         if (repRest) {
           setRepRest(false);
@@ -131,17 +143,24 @@ const Timer: NextPage<TimerProps> = (props) => {
           setCurrentRep(1);
         }
         startTimer(props.repDuration * 1000);
-      } else if (timer === 0 && currentRep < props.reps && !repRest) {
+      } else if (
+        timer === 0 &&
+        currentRep < props.reps &&
+        !repRest &&
+        props.repsRest > 0
+      ) {
+        console.log('in reps rest');
         setRepRest(true);
         setTimer(props.repsRest * 1000);
       } else if (
         timer === 0 &&
         currentRep === props.reps &&
         currentSet < props.sets &&
-        !setRest
+        !setRest &&
+        props.setsRest > 0
       ) {
         setSetRest(true);
-        setTimer(props.repsRest * 1000);
+        setTimer(props.setsRest * 1000);
       } else if (timer === 0 && currentSet === props.sets) {
         resetTimer();
       }
@@ -157,6 +176,7 @@ const Timer: NextPage<TimerProps> = (props) => {
     props.reps,
     props.repDuration,
     props.repsRest,
+    props.setsRest,
     repRest,
     setRest
   ]);
