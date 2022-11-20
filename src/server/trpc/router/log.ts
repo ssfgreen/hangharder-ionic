@@ -13,7 +13,7 @@ const defaultLogSelect = Prisma.validator<Prisma.LogSelect>()({
 interface LogInput {
   exerciseId: string;
   userId: string;
-  [key: string]: any;
+  [key: string]: any; // allows other key/value pairs - might be another way to do this?
 }
 
 export const logRouter = router({

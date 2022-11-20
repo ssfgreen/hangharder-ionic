@@ -22,6 +22,14 @@ export const exerciseRouter = router({
       }
     });
   }),
+  getIds: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.exercise.findMany({
+      select: {
+        id: true
+      },
+      where: {}
+    });
+  }),
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.exercise.findMany({
       select: defaultExerciseSelect,

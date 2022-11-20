@@ -84,6 +84,7 @@ model Exercise {
   image       String?
   video       String?
 
+  repDuration Int?
   sets        Int?
   reps        Int?
   setsRest    Int?

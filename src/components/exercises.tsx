@@ -3,23 +3,15 @@ import { trpc } from '../utils/trpc';
 import Exercise from './exercise';
 
 const Exercises: NextPage = () => {
-  const { data: exercises, isLoading } = trpc.exercise.getAll.useQuery();
+  const { data: exerciseIds, isLoading } = trpc.exercise.getIds.useQuery();
 
-  console.log(exercises);
+  console.log(exerciseIds);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading Exercises...</div>;
 
-  const Exercises = exercises
-    ? exercises.map((exercise, i) => {
-        return (
-          <Exercise
-            key={i}
-            exId={exercise.id}
-            title={exercise.title}
-            summary={exercise.summary}
-            author={exercise.author && exercise.author.name}
-          />
-        );
+  const Exercises = exerciseIds
+    ? exerciseIds.map((exercise, i) => {
+        return <Exercise key={i} id={exercise.id} />;
       })
     : null;
 
