@@ -20,11 +20,14 @@ const Exercise: NextPage<ExerciseProps> = (props) => {
     exercise && timerKeys.every((key) => exercise[key] !== null);
 
   return exercise ? (
-    <div className="border p-2">
-      <h1>{exercise.title}</h1>
-      <p>{exercise.summary}</p>
-      <p>By {exercise.author.name}</p>
-      <Log id={props.id} />
+    <div className="m-2 rounded border bg-neutral-800 p-2">
+      <div className="m-1 space-y-1">
+        <header className="flex flex-row items-center space-x-2">
+          <h1 className="text-xl">{exercise.title}</h1>
+          <span className="text-xs">by {exercise.author.name}</span>
+        </header>
+        <p>{exercise.summary}</p>
+      </div>
       {timerAvailable && (
         <Timer
           repDuration={exercise.repDuration as number}
@@ -34,6 +37,9 @@ const Exercise: NextPage<ExerciseProps> = (props) => {
           setsRest={exercise.setsRest as number}
         ></Timer>
       )}
+      <div className="flex justify-center">
+        <Log id={props.id} />
+      </div>
     </div>
   ) : (
     <div>Exercise {props.id} not found</div>

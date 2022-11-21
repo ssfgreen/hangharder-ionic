@@ -190,7 +190,7 @@ const renderInstruction = (
   } else if (timerState === TimerState.PAUSED) {
     return 'Paused';
   } else {
-    return '';
+    return 'Play to Start';
   }
 };
 
@@ -300,22 +300,14 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
   }, [state, props]);
 
   return (
-    <div className="border p-2">
-      <h1>Timer</h1>
-      <div className="flex flex-row justify-between">
-        <span>{formatTime(props.repDuration)} per rep</span>
-        <span>{props.reps} reps</span>
-        <span>{props.sets} sets</span>
-      </div>
-      <p>{formatTime(props.repsRest)} rest between reps</p>
-      <p>{formatTime(props.setsRest)} rest between sets</p>
+    <div className="m-1 rounded bg-neutral-900 p-2">
       <div
-        className={`flex flex-row justify-between ${getColour(
+        className={`m-6 flex flex-col content-center items-center justify-center ${getColour(
           state.activeStatus,
           state.timerState
         )}`}
       >
-        <span className="text-2xl">
+        <span className="text-4xl">
           <span>
             {state.timerState === TimerState.UNSTARTED
               ? minsFromDs(props.repDuration * 10)
@@ -335,15 +327,31 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
         </span>
         <span>{renderInstruction(state.activeStatus, state.timerState)}</span>
       </div>
-      <div className="flex flex-row justify-between">
-        <span>
-          Rep {state.currentRep} / {props.reps}
+      <div className="center-items flex flex-row justify-between">
+        <span className="m-2 flex flex-row items-center rounded bg-slate-200 p-2 text-slate-900">
+          <p className="text-sm">Rep: </p>
+          {state.currentRep} / {props.reps}
         </span>
-        <span>
-          Set {state.currentSet} / {props.sets}
+        <span className="m-2 flex flex-row items-center rounded bg-slate-200 p-2 text-slate-900">
+          <p className="text-sm">Set: </p>
+          {state.currentSet} / {props.sets}
         </span>
       </div>
       <div className="flex flex-row justify-between">
+        <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+          <p>Work</p>
+          {formatTime(props.repDuration)}
+        </span>
+        <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+          <p>Rep Rest</p>
+          {formatTime(props.repsRest)}
+        </span>
+        <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+          <p>Set Rest</p>
+          {formatTime(props.setsRest)}
+        </span>
+      </div>
+      <div className="m-2 flex flex-row justify-between">
         <button onClick={() => dispatch({ type: 'PREV_SET' })}>
           <IonIcon icon={playSkipBack} />
         </button>
@@ -357,7 +365,7 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
           <IonIcon icon={playSkipForward} />
         </button>
       </div>
-      <div className="flex flex-row justify-between">
+      <div className="m-2 flex flex-row justify-between">
         <button
           className="rounded-xl bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
           onClick={handlePlayPause}

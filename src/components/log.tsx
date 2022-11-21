@@ -22,7 +22,9 @@ const Log: NextPage<LogProps> = (props) => {
 
   return (
     <div>
-      <button onClick={handleLog}>Log Exercise</button>
+      <button className="m-2 rounded bg-blue-400 p-2" onClick={handleLog}>
+        Log Exercise
+      </button>
       {mutation.error && (
         <p className="text-red">
           Something went wrong! {mutation.error.message}
