@@ -9,6 +9,7 @@ import {
 } from '@ionic/react';
 import { cog, flash, list } from 'ionicons/icons';
 
+import Exercise from './Exercise';
 import Exercises from './Exercises';
 import Settings from './Settings';
 
@@ -17,6 +18,11 @@ const Tabs = () => {
     <IonTabs>
       <IonRouterOutlet>
         <Route path="/tabs/exercises" component={Exercises} exact={true} />
+        <Route
+          path="/tabs/exercises/:exerciseId"
+          component={Exercise}
+          exact={true}
+        />
         <Route path="/tabs/settings" component={Settings} exact={true} />
         <Route
           path="/tabs"
@@ -29,7 +35,7 @@ const Tabs = () => {
           <IonIcon icon={flash} />
           <IonLabel>Feed</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab3" href="/tabs/settings">
+        <IonTabButton tab="tab3" href="/tabs/settings" className="text-primary">
           <IonIcon icon={cog} />
           <IonLabel>Settings</IonLabel>
         </IonTabButton>
