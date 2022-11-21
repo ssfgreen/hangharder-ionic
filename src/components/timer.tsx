@@ -1,198 +1,255 @@
-import { getDefaultState } from '@tanstack/query-core/build/lib/mutation';
 import type { NextPage } from 'next';
-import React from 'react';
+import React, { useReducer, useEffect } from 'react';
+import { IonIcon } from '@ionic/react';
+import {
+  play,
+  pause,
+  refresh,
+  playBack,
+  playForward,
+  playSkipBack,
+  playSkipForward
+} from 'ionicons/icons';
+import {
+  formatTime,
+  minsFromMillis,
+  secsFromMillis,
+  millisRemaining
+} from '../utils/timer';
+import {
+  TimerActiveStatus,
+  TimerState,
+  TimerActions
+} from '../constants/timer';
+import type { TimerPropTypes, StateTypes, ActionTypes } from '../types/timer';
 
-interface TimerProps {
-  repDuration: number;
-  reps: number;
-  sets: number;
-  repsRest: number;
-  setsRest: number;
-}
-
-const Timer: NextPage<TimerProps> = (props) => {
-  const [currentRep, setCurrentRep] = React.useState(1);
-  const [currentSet, setCurrentSet] = React.useState(1);
-  const [started, setStarted] = React.useState(false);
-  const [repRest, setRepRest] = React.useState(false);
-  const [setRest, setSetRest] = React.useState(false);
-  const [locationChanged, setLocationChanged] = React.useState(false);
-  const [countdown, setCountdown] = React.useState(false);
-  const [playing, setPlaying] = React.useState(false);
-  const [timer, setTimer] = React.useState(0);
-
-  // format seconds in mm:ss
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+const init = (initialProps: StateTypes): StateTypes => {
+  return {
+    currentRep: initialProps.currentRep,
+    currentSet: initialProps.currentSet,
+    timer: initialProps.timer,
+    activeStatus: initialProps.activeStatus,
+    timerState: initialProps.timerState,
+    reps: initialProps.reps,
+    sets: initialProps.sets,
+    repDuration: initialProps.repDuration,
+    countdown: initialProps.countdown
   };
+};
 
-  const minsFromMillis = (millis: number) => {
-    const mins = Math.floor(millis / 1000 / 60);
-    return mins < 10 ? `0${mins}` : mins;
-  };
-
-  const secsFromMillis = (millis: number) => {
-    const secs = Math.floor(millis / 1000) % 60;
-    return secs < 10 ? `0${secs}` : secs;
-  };
-
-  const millisRemaining = (millis: number) => {
-    let m = millis % 1000;
-    m = Math.round(m / 100);
-    return m == 10 ? 0 : m;
-  };
-
-  // start timer
-  const startTimer = (duration: number) => {
-    console.log('called', duration);
-    setTimer(duration);
-    setPlaying(true);
-    setRepRest(false);
-  };
-
-  // reset timer
-  const resetTimer = () => {
-    setTimer(0);
-    setStarted(false);
-    setPlaying(false);
-    setCurrentRep(1);
-    setCurrentSet(1);
-    setRepRest(false);
-    setSetRest(false);
-  };
-
-  const resetOnLocationChange = () => {
-    setTimer(0);
-    setPlaying(false);
-    setRepRest(false);
-    setSetRest(false);
-    setLocationChanged(true);
-  };
-
-  const adjustRep = (increment: number) => {
-    if (currentRep + increment <= props.reps && currentRep + increment > 0) {
-      setCurrentRep(currentRep + increment);
-      resetOnLocationChange();
-    }
-    if (
-      increment > 0 &&
-      currentRep + increment > props.reps &&
-      currentSet + increment <= props.sets
-    ) {
-      setCurrentRep(1);
-      setCurrentSet(currentSet + increment);
-      resetOnLocationChange();
-    }
-    if (
-      increment < 0 &&
-      currentRep + increment < 1 &&
-      currentSet + increment > 0
-    ) {
-      setCurrentRep(props.reps);
-      setCurrentSet(currentSet + increment);
-      resetOnLocationChange();
-    }
-  };
-
-  const adjustSet = (increment: number) => {
-    if (currentSet + increment <= props.sets && currentSet + increment > 0) {
-      setCurrentSet(currentSet + increment);
-      setCurrentRep(1);
-      resetOnLocationChange();
-    }
-  };
-
-  const getInstruction = () => {
-    if (countdown || (timer <= 1000 && (repRest || setRest)))
-      return 'Get Ready';
-    if (!started) return 'Click Start to begin';
-    if (repRest) return 'Rep Rest';
-    if (setRest) return 'Set Rest';
-    if (timer === 0 && currentRep === props.reps && currentSet === props.sets)
-      return 'Finished!';
-    if (playing && (!repRest || !setRest)) return 'Work';
-    if (!playing) return 'Paused';
-  };
-
-  // handle timer
-  React.useEffect(() => {
-    if (started) {
-      if (timer > 0) {
-        const interval = setInterval(() => {
-          if (playing) {
-            setTimer(timer - 1);
-          }
-        }, 1);
-        return () => clearInterval(interval);
-      } else if (countdown) {
-        setCountdown(false);
-        setTimer(props.repDuration * 1000);
-      } else if (timer === 0 && locationChanged) {
-        setLocationChanged(false);
-        setTimer(props.repDuration * 1000);
-      } else if (timer === 0 && (repRest || setRest)) {
-        if (repRest) {
-          setRepRest(false);
-          setCurrentRep(currentRep + 1);
-        }
-        if (setRest) {
-          setSetRest(false);
-          setCurrentSet(currentSet + 1);
-          setCurrentRep(1);
-        }
-        startTimer(props.repDuration * 1000);
-      } else if (
-        timer === 0 &&
-        currentRep < props.reps &&
-        !repRest &&
-        props.repsRest > 0
-      ) {
-        console.log('in reps rest');
-        setRepRest(true);
-        setTimer(props.repsRest * 1000);
-      } else if (
-        timer === 0 &&
-        currentRep === props.reps &&
-        currentSet < props.sets &&
-        !setRest &&
-        props.setsRest > 0
-      ) {
-        setSetRest(true);
-        setTimer(props.setsRest * 1000);
-      } else if (timer === 0 && currentSet === props.sets) {
-        resetTimer();
+const reducer = (state: StateTypes, action: ActionTypes): StateTypes => {
+  switch (action.type) {
+    case 'START':
+      return {
+        ...state,
+        activeStatus: TimerActiveStatus.COUNTDOWN,
+        timerState: TimerState.PLAYING,
+        timer: state.countdown
+      };
+    case 'UPDATE':
+      return {
+        ...state,
+        timer: action.timer as number,
+        activeStatus: action.activeStatus as TimerActiveStatus,
+        currentRep: action.currentRep || state.currentRep,
+        currentSet: action.currentSet || state.currentSet
+      };
+    case 'FINISH':
+      return {
+        ...state,
+        activeStatus: TimerActiveStatus.DONE,
+        timerState: TimerState.DONE
+      };
+    case 'TICK':
+      return {
+        ...state,
+        timer: state.timer - 1
+      };
+    case 'PAUSE':
+      return {
+        ...state,
+        timerState: TimerState.PAUSED
+      };
+    case 'RESUME':
+      if (state.activeStatus === TimerActiveStatus.COUNTDOWN) {
+        return {
+          ...state,
+          timer: state.countdown,
+          timerState: TimerState.PLAYING
+        };
+      } else {
+        return {
+          ...state,
+          timerState: TimerState.PLAYING
+        };
       }
-    }
-  }, [
-    timer,
-    started,
-    countdown,
-    playing,
-    currentRep,
-    currentSet,
-    props.sets,
-    props.reps,
-    props.repDuration,
-    props.repsRest,
-    props.setsRest,
-    repRest,
-    setRest
-  ]);
+    case 'PREV_SET':
+      if (state.currentSet > 1) {
+        return {
+          ...state,
+          timer: state.repDuration,
+          activeStatus: TimerActiveStatus.COUNTDOWN,
+          timerState: TimerState.PAUSED,
+          currentSet: state.currentSet - 1,
+          currentRep: 1
+        };
+      } else {
+        return state;
+      }
+    case 'NEXT_SET':
+      if (state.currentSet < state.sets) {
+        return {
+          ...state,
+          timer: state.repDuration,
+          activeStatus: TimerActiveStatus.COUNTDOWN,
+          timerState: TimerState.PAUSED,
+          currentSet: state.currentSet + 1,
+          currentRep: 1
+        };
+      } else {
+        return {
+          ...state,
+          activeStatus: TimerActiveStatus.DONE,
+          timerState: TimerState.DONE,
+          timer: 0,
+          currentRep: state.reps,
+          currentSet: state.sets
+        };
+      }
+    case 'PREV_REP':
+      if (state.currentRep > 1) {
+        return {
+          ...state,
+          currentRep: state.currentRep - 1,
+          timer: state.repDuration,
+          activeStatus: TimerActiveStatus.COUNTDOWN,
+          timerState: TimerState.PAUSED
+        };
+      } else if (state.currentSet > 1) {
+        return {
+          ...state,
+          currentRep: state.reps,
+          currentSet: state.currentSet - 1,
+          timer: state.repDuration,
+          activeStatus: TimerActiveStatus.COUNTDOWN,
+          timerState: TimerState.PAUSED
+        };
+      } else {
+        return state;
+      }
+    case 'NEXT_REP':
+      if (state.currentRep < state.reps) {
+        return {
+          ...state,
+          currentRep: state.currentRep + 1,
+          timer: state.repDuration,
+          activeStatus: TimerActiveStatus.COUNTDOWN,
+          timerState: TimerState.PAUSED
+        };
+      } else if (state.currentSet < state.sets) {
+        return {
+          ...state,
+          currentRep: 1,
+          currentSet: state.currentSet + 1,
+          timer: state.repDuration,
+          activeStatus: TimerActiveStatus.COUNTDOWN,
+          timerState: TimerState.PAUSED
+        };
+      } else {
+        return {
+          ...state,
+          activeStatus: TimerActiveStatus.DONE,
+          timerState: TimerState.DONE,
+          timer: 0
+        };
+      }
+    case 'RESET':
+      return init(action.payload);
+    default:
+      throw new Error();
+  }
+};
+
+const Timer: NextPage<TimerPropTypes> = (props) => {
+  const initialProps = {
+    currentRep: 1,
+    currentSet: 1,
+    timer: 0,
+    activeStatus: TimerActiveStatus.INACTIVE,
+    timerState: TimerState.UNSTARTED,
+    reps: props.reps,
+    sets: props.sets,
+    repDuration: props.repDuration * 1000,
+    countdown: 3000
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialProps, init);
 
   const handlePlayPause = () => {
-    if (!started) {
-      setStarted(true);
-      setCountdown(true);
-      setTimer(3 * 1000);
-    }
-    if (!playing) {
-      setPlaying(true);
-    } else {
-      setPlaying(false);
+    if (state.timerState === TimerState.UNSTARTED) {
+      dispatch({ type: TimerActions.START });
+    } else if (state.timerState === TimerState.PLAYING) {
+      dispatch({ type: TimerActions.PAUSE });
+    } else if (state.timerState === TimerState.PAUSED) {
+      dispatch({ type: TimerActions.RESUME });
     }
   };
+
+  useEffect(() => {
+    if (state.timer > 0) {
+      const interval = setInterval(() => {
+        if (state.timerState === TimerState.PLAYING) {
+          dispatch({ type: TimerActions.TICK });
+        }
+      }, 1);
+      return () => clearInterval(interval);
+    } else if (state.activeStatus === TimerActiveStatus.COUNTDOWN) {
+      dispatch({
+        type: TimerActions.UPDATE,
+        timer: props.repDuration * 1000,
+        activeStatus: TimerActiveStatus.WORK
+      });
+    } else if (state.activeStatus === TimerActiveStatus.REST) {
+      let updateRep = state.currentRep;
+      let updateSet = state.currentSet;
+      if (updateRep < props.reps) {
+        updateRep++;
+      } else if (updateRep === props.reps) {
+        updateRep = 1;
+        if (updateSet < props.sets) {
+          updateSet++;
+        }
+      }
+      dispatch({
+        type: TimerActions.UPDATE,
+        timer: props.repDuration * 1000,
+        activeStatus: TimerActiveStatus.WORK,
+        currentRep: updateRep,
+        currentSet: updateSet
+      });
+    } else if (state.activeStatus === TimerActiveStatus.WORK) {
+      if (state.currentRep < props.reps) {
+        dispatch({
+          type: TimerActions.UPDATE,
+          timer: props.repsRest * 1000,
+          activeStatus: TimerActiveStatus.REST
+        });
+      } else if (
+        state.currentRep === props.reps &&
+        state.currentSet < props.sets
+      ) {
+        dispatch({
+          type: TimerActions.UPDATE,
+          timer: props.setsRest * 1000,
+          activeStatus: TimerActiveStatus.REST
+        });
+      } else {
+        dispatch({
+          type: TimerActions.FINISH
+        });
+      }
+    }
+  }, [state, props]);
 
   return (
     <div className="border p-2">
@@ -206,48 +263,64 @@ const Timer: NextPage<TimerProps> = (props) => {
       <p>{formatTime(props.setsRest)} rest between sets</p>
       <div className="text-xl">
         <span>
-          {!started
+          {state.timerState === TimerState.UNSTARTED
             ? minsFromMillis(props.repDuration * 1000)
-            : minsFromMillis(timer)}
+            : minsFromMillis(state.timer)}
         </span>
         <span>:</span>
         <span>
-          {!started
+          {state.timerState === TimerState.UNSTARTED
             ? secsFromMillis(props.repDuration * 1000)
-            : secsFromMillis(timer)}
+            : secsFromMillis(state.timer)}
         </span>
         <span>:</span>
-        <span>{!started ? '0' : millisRemaining(timer)}</span>
-        <span className="pl-2 text-xs">{getInstruction()}</span>
-      </div>
-      <div className="flex flex-row justify-between">
         <span>
-          Rep {currentRep} / {props.reps}
-        </span>
-        <span>
-          Set {currentSet} / {props.sets}
+          {state.timerState === TimerState.UNSTARTED
+            ? '0'
+            : millisRemaining(state.timer)}
         </span>
       </div>
       <div className="flex flex-row justify-between">
-        <button className="p-2" onClick={() => adjustSet(-1)}>
-          Back Set
+        <span>
+          Rep {state.currentRep} / {props.reps}
+        </span>
+        <span>
+          Set {state.currentSet} / {props.sets}
+        </span>
+      </div>
+      <div className="flex flex-row justify-between">
+        <button onClick={() => dispatch({ type: 'PREV_SET' })}>
+          <IonIcon icon={playSkipBack} />
         </button>
-        <button className="p-2" onClick={() => adjustRep(-1)}>
-          Back Rep
+        <button onClick={() => dispatch({ type: 'PREV_REP' })}>
+          <IonIcon icon={playBack} />
         </button>
-        <button className="p-2" onClick={() => adjustRep(1)}>
-          Next Rep
+        <button onClick={() => dispatch({ type: 'NEXT_REP' })}>
+          <IonIcon icon={playForward} />
         </button>
-        <button className="p-2" onClick={() => adjustSet(1)}>
-          Next Set
+        <button onClick={() => dispatch({ type: 'NEXT_SET' })}>
+          <IonIcon icon={playSkipForward} />
         </button>
       </div>
       <div className="flex flex-row justify-between">
-        <button className="p-2" onClick={handlePlayPause}>
-          {!started ? 'Start' : playing ? 'Pause' : 'Play'}
+        <button
+          className="rounded-xl bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
+          onClick={handlePlayPause}
+        >
+          {state.timerState === TimerState.PLAYING ? (
+            <IonIcon icon={pause} />
+          ) : (
+            <IonIcon icon={play} />
+          )}
         </button>
-        <button className="p-2" onClick={resetTimer}>
-          Reset
+        <span>{state.activeStatus}</span>
+        <button
+          className="rounded-xl bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+          onClick={() =>
+            dispatch({ type: TimerActions.RESET, payload: initialProps })
+          }
+        >
+          <IonIcon icon={refresh} />
         </button>
       </div>
     </div>
