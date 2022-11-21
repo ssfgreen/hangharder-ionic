@@ -3,15 +3,24 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
  * This is especially useful for Docker builds.
  */
-!process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
+!process.env.SKIP_ENV_VALIDATION && (await import('./src/env/server.mjs'));
+
+// This is required as the libraries are not automatically transpiled by next.js
+import withTmInitializer from 'next-transpile-modules';
+const withTM = withTmInitializer([
+  '@ionic/react',
+  '@ionic/core',
+  '@stencil/core',
+  'ionicons'
+]);
 
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
   swcMinify: true,
   i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
-  },
+    locales: ['en'],
+    defaultLocale: 'en'
+  }
 };
-export default config;
+export default withTM(config);
