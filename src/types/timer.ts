@@ -27,7 +27,7 @@ export interface ActionTypes {
   timerState?: TimerState;
   currentRep?: number;
   currentSet?: number;
-  payload?: any;
+  payload?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   reps?: number;
   sets?: number;
 }

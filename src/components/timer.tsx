@@ -12,9 +12,9 @@ import {
 } from 'ionicons/icons';
 import {
   formatTime,
-  minsFromMillis,
-  secsFromMillis,
-  millisRemaining
+  minsFromDs,
+  secsFromDs,
+  decisRemaining
 } from '../utils/timer';
 import {
   TimerActiveStatus,
@@ -170,6 +170,54 @@ const reducer = (state: StateTypes, action: ActionTypes): StateTypes => {
   }
 };
 
+const renderInstruction = (
+  activeStatus: TimerActiveStatus,
+  timerState: TimerState
+): string => {
+  if (timerState === TimerState.PLAYING) {
+    switch (activeStatus) {
+      case TimerActiveStatus.COUNTDOWN:
+        return 'Get Ready';
+      case TimerActiveStatus.REST:
+        return 'Rest';
+      case TimerActiveStatus.WORK:
+        return 'Go!';
+      case TimerActiveStatus.DONE:
+        return 'Done';
+      default:
+        return '';
+    }
+  } else if (timerState === TimerState.PAUSED) {
+    return 'Paused';
+  } else {
+    return '';
+  }
+};
+
+const getColour = (
+  activeStatus: TimerActiveStatus,
+  timerState: TimerState
+): string => {
+  if (timerState === TimerState.PLAYING) {
+    switch (activeStatus) {
+      case TimerActiveStatus.COUNTDOWN:
+        return 'text-orange-400';
+      case TimerActiveStatus.REST:
+        return 'text-blue-400';
+      case TimerActiveStatus.WORK:
+        return 'text-green-400';
+      case TimerActiveStatus.DONE:
+        return 'text-blue-500';
+      default:
+        return '';
+    }
+  } else if (timerState === TimerState.PAUSED) {
+    return 'text-red-400';
+  } else {
+    return 'text-primary';
+  }
+};
+
 const Timer: NextPage<TimerPropTypes> = (props) => {
   const initialProps = {
     currentRep: 1,
@@ -179,8 +227,8 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
     timerState: TimerState.UNSTARTED,
     reps: props.reps,
     sets: props.sets,
-    repDuration: props.repDuration * 1000,
-    countdown: 3000
+    repDuration: props.repDuration * 10,
+    countdown: 30
   };
 
   const [state, dispatch] = useReducer(reducer, initialProps, init);
@@ -201,12 +249,12 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
         if (state.timerState === TimerState.PLAYING) {
           dispatch({ type: TimerActions.TICK });
         }
-      }, 1);
+      }, 100);
       return () => clearInterval(interval);
     } else if (state.activeStatus === TimerActiveStatus.COUNTDOWN) {
       dispatch({
         type: TimerActions.UPDATE,
-        timer: props.repDuration * 1000,
+        timer: props.repDuration * 10,
         activeStatus: TimerActiveStatus.WORK
       });
     } else if (state.activeStatus === TimerActiveStatus.REST) {
@@ -222,7 +270,7 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
       }
       dispatch({
         type: TimerActions.UPDATE,
-        timer: props.repDuration * 1000,
+        timer: props.repDuration * 10,
         activeStatus: TimerActiveStatus.WORK,
         currentRep: updateRep,
         currentSet: updateSet
@@ -231,7 +279,7 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
       if (state.currentRep < props.reps) {
         dispatch({
           type: TimerActions.UPDATE,
-          timer: props.repsRest * 1000,
+          timer: props.repsRest * 10,
           activeStatus: TimerActiveStatus.REST
         });
       } else if (
@@ -240,7 +288,7 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
       ) {
         dispatch({
           type: TimerActions.UPDATE,
-          timer: props.setsRest * 1000,
+          timer: props.setsRest * 10,
           activeStatus: TimerActiveStatus.REST
         });
       } else {
@@ -261,24 +309,31 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
       </div>
       <p>{formatTime(props.repsRest)} rest between reps</p>
       <p>{formatTime(props.setsRest)} rest between sets</p>
-      <div className="text-xl">
-        <span>
-          {state.timerState === TimerState.UNSTARTED
-            ? minsFromMillis(props.repDuration * 1000)
-            : minsFromMillis(state.timer)}
+      <div
+        className={`flex flex-row justify-between ${getColour(
+          state.activeStatus,
+          state.timerState
+        )}`}
+      >
+        <span className="text-2xl">
+          <span>
+            {state.timerState === TimerState.UNSTARTED
+              ? minsFromDs(props.repDuration * 10)
+              : minsFromDs(state.timer)}
+          </span>
+          <span>:</span>
+          <span>
+            {state.timerState === TimerState.UNSTARTED
+              ? secsFromDs(props.repDuration * 10)
+              : secsFromDs(state.timer)}
+          </span>
+          <span className="text-sm">
+            {state.timerState === TimerState.UNSTARTED
+              ? '0'
+              : decisRemaining(state.timer)}
+          </span>
         </span>
-        <span>:</span>
-        <span>
-          {state.timerState === TimerState.UNSTARTED
-            ? secsFromMillis(props.repDuration * 1000)
-            : secsFromMillis(state.timer)}
-        </span>
-        <span>:</span>
-        <span>
-          {state.timerState === TimerState.UNSTARTED
-            ? '0'
-            : millisRemaining(state.timer)}
-        </span>
+        <span>{renderInstruction(state.activeStatus, state.timerState)}</span>
       </div>
       <div className="flex flex-row justify-between">
         <span>
@@ -313,7 +368,6 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
             <IonIcon icon={play} />
           )}
         </button>
-        <span>{state.activeStatus}</span>
         <button
           className="rounded-xl bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
           onClick={() =>
