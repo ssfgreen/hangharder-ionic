@@ -1,6 +1,5 @@
 import type { NextPage } from 'next';
-import { trpc } from '../utils/trpc';
-import { useSession } from 'next-auth/react';
+import { trpc } from '../../utils/trpc';
 import Timer from './timer';
 import Log from './log';
 

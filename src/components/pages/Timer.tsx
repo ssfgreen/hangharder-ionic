@@ -15,13 +15,17 @@ import {
   minsFromDs,
   secsFromDs,
   decisRemaining
-} from '../utils/timer';
+} from '../../utils/timer';
 import {
   TimerActiveStatus,
   TimerState,
   TimerActions
-} from '../constants/timer';
-import type { TimerPropTypes, StateTypes, ActionTypes } from '../types/timer';
+} from '../../constants/timer';
+import type {
+  TimerPropTypes,
+  StateTypes,
+  ActionTypes
+} from '../../types/timer';
 
 const init = (initialProps: StateTypes): StateTypes => {
   return {

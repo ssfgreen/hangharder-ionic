@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
-import { trpc } from '../utils/trpc';
-import Exercise from './exercise';
+import { trpc } from '../../utils/trpc';
+import Exercise from './Exercise';
 
 const Exercises: NextPage = () => {
   const { data: exerciseIds, isLoading } = trpc.exercise.getIds.useQuery();
