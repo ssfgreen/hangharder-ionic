@@ -12,28 +12,35 @@ import {
   IonToolbar
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import { cog, flash, list } from 'ionicons/icons';
-
-const pages = [
-  {
-    title: 'Exercises',
-    icon: flash,
-    url: '/tabs/exercises'
-  },
-  {
-    title: 'Logbook',
-    icon: list,
-    url: '/tabs/logbook'
-  },
-  {
-    title: 'Settings',
-    icon: cog,
-    url: '/tabs/settings'
-  }
-];
+import { useSession } from 'next-auth/react';
+import { cog, flash, list, logInOutline, logOutOutline } from 'ionicons/icons';
 
 const Menu = () => {
+  const { data: session } = useSession();
   const [isDark, setIsDark] = useState(false);
+
+  const pages = [
+    {
+      title: 'Exercises',
+      icon: flash,
+      url: '/tabs/exercises'
+    },
+    {
+      title: 'Logbook',
+      icon: list,
+      url: '/tabs/logbook'
+    },
+    {
+      title: 'Settings',
+      icon: cog,
+      url: '/tabs/settings'
+    },
+    {
+      title: session?.user ? 'Logout' : 'Login',
+      icon: session?.user ? logOutOutline : logInOutline,
+      url: '/tabs/login'
+    }
+  ];
 
   const handleOpen = async () => {
     try {

@@ -12,8 +12,17 @@ import {
   IonContent,
   IonBackButton,
   IonButtons,
-  IonSpinner
+  IonSpinner,
+  IonIcon
 } from '@ionic/react';
+import {
+  clipboardOutline,
+  heart,
+  star,
+  starOutline,
+  stopwatchOutline
+} from 'ionicons/icons';
+import { start } from 'repl';
 
 const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
   const [logModalOpen, setLogModalOpen] = useState(false);
@@ -26,8 +35,9 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
   const { data: exercise } = trpc.exercise.getById.useQuery(exerciseId);
 
   const timerKeys = ['repDuration', 'reps', 'sets', 'repsRest', 'setsRest'];
-  const timerAvailable =
-    exercise && timerKeys.every((key) => exercise[key] !== null);
+  const workoutsAvailable = exercise?.workouts?.length > 0;
+
+  console.log(exercise);
 
   return !exercise ? (
     <IonSpinner></IonSpinner>
@@ -55,30 +65,37 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
             </header>
             <p>{exercise.summary}</p>
           </div>
-          {timerAvailable && (
-            <TimerModal
-              title={exercise.title}
-              isOpen={timerModalOpen}
-              setIsOpen={setTimerModalOpen}
-              repDuration={exercise.repDuration as number}
-              reps={exercise.reps as number}
-              sets={exercise.sets as number}
-              repsRest={exercise.repsRest as number}
-              setsRest={exercise.setsRest as number}
-            ></TimerModal>
-          )}
           <button onClick={() => setTimerModalOpen(!timerModalOpen)}>
-            Start Activity
+            <IonIcon icon={stopwatchOutline} />
+            Start Workout
           </button>
           <button onClick={() => setLogModalOpen(!logModalOpen)}>
+            <IonIcon icon={clipboardOutline} />
             Log Workout
           </button>
-          <LogModal
-            id={exerciseId}
-            isOpen={logModalOpen}
-            setIsOpen={setLogModalOpen}
-          />
+          <button onClick={() => console.log('fav')}>
+            <IonIcon icon={starOutline} />
+            Favorite
+          </button>
+          EXERCISE OVERVIEW
         </div>
+        <LogModal
+          id={exerciseId}
+          isOpen={logModalOpen}
+          setIsOpen={setLogModalOpen}
+        />
+        {workoutsAvailable && (
+          <TimerModal
+            title={exercise.title}
+            isOpen={timerModalOpen}
+            setIsOpen={setTimerModalOpen}
+            repDuration={exercise.workouts[0].repDuration as number}
+            reps={exercise.workouts[0].reps as number}
+            sets={exercise.workouts[0].sets as number}
+            repsRest={exercise.workouts[0].repsRest as number}
+            setsRest={exercise.workouts[0].setsRest as number}
+          ></TimerModal>
+        )}
       </IonContent>
     </IonPage>
   );

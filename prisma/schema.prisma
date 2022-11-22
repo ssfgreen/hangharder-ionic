@@ -56,6 +56,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   authoredExercises     Exercise[]  @relation("ExerciseAuthor")
+  authoredWorkouts      Workout[]   @relation("WorkoutAuthor")
   likedExercises        Exercise[]  @relation("ExerciseLiker")
   LoggedExercises       Log[]
 }
@@ -84,6 +85,22 @@ model Exercise {
   image       String?
   video       String?
 
+  workouts    Workout[]
+  likedBy     User[]   @relation("ExerciseLiker")
+  logs        Log[]
+}
+
+enum WorkOutTypes {
+  TIMER
+}
+
+model Workout {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  type        WorkOutTypes
+  duration    Int?
+
   repDuration Int?
   sets        Int?
   reps        Int?
@@ -93,8 +110,14 @@ model Exercise {
   effort      String?
   focus       String?
   
-  likedBy     User[]   @relation("ExerciseLiker")
-  logs        Log[]
+  author      User     @relation("WorkoutAuthor", fields: [authorId], references: [id])
+  authorId    String
+  
+  image       String?
+  video       String?
+
+  exercise    Exercise @relation(fields: [exerciseId], references: [id])
+  exerciseId  String
 }
 
 enum Level {

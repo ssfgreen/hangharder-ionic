@@ -47,8 +47,6 @@ export const logRouter = router({
         data['comment'] = input.comment;
       }
 
-      console.log('Data in router', data);
-
       const log = ctx.prisma.log.create({
         data: data
       });
@@ -75,6 +73,25 @@ export const logRouter = router({
       return ctx.prisma.log.findMany({
         where: {
           userId: input.userId
+        },
+        include: {
+          user: true,
+          exercise: true
+        }
+      });
+    }),
+  getMyLogsByExercise: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        exerciseId: z.string()
+      })
+    )
+    .query(({ ctx, input }) => {
+      return ctx.prisma.log.findMany({
+        where: {
+          userId: input.userId,
+          exerciseId: input.exerciseId
         },
         include: {
           user: true,

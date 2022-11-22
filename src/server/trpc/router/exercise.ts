@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router, publicProcedure } from '../trpc';
+import { router, publicProcedure, protectedProcedure } from '../trpc';
 import { Prisma } from '@prisma/client';
 
 const defaultExerciseSelect = Prisma.validator<Prisma.ExerciseSelect>()({
@@ -20,6 +20,11 @@ const minimialSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   author: true
 });
 
+interface ExerciseInsertType {
+  title: string;
+  summary: string;
+}
+
 export const exerciseRouter = router({
   getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.exercise.findFirst({
@@ -27,7 +32,8 @@ export const exerciseRouter = router({
         id: input
       },
       include: {
-        author: true
+        author: true,
+        workouts: true
       }
     });
   }),
@@ -56,5 +62,22 @@ export const exerciseRouter = router({
         createdAt: 'desc'
       }
     });
-  })
+  }),
+  insertOne: protectedProcedure
+    .input(
+      z.object({
+        title: z.string(),
+        summary: z.string(),
+        authorId: z.string()
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.exercise.create({
+        data: {
+          title: input.title,
+          summary: input.summary,
+          authorId: input.authorId
+        }
+      });
+    })
 });

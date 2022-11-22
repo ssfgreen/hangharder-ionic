@@ -1,6 +1,8 @@
 import type { NextPage } from 'next';
 import { trpc } from '../../utils/trpc';
 import Exercise from './Exercise';
+import React, { useState } from 'react';
+import CreateExerciseModal from './CreateExerciseModal';
 
 import {
   IonPage,
@@ -12,8 +14,11 @@ import {
   IonLabel,
   IonButtons,
   IonMenuButton,
-  IonSpinner
+  IonSpinner,
+  IonButton,
+  IonIcon
 } from '@ionic/react';
+import { add } from 'ionicons/icons';
 import { useEffect } from 'react';
 
 const ExerciseEntry = (props) => (
@@ -45,6 +50,8 @@ const AllExercises = () => {
 };
 
 const Exercises: NextPage = () => {
+  const [createExerciseModalOpen, setCreateExerciseModalOpen] = useState(false);
+
   return (
     <IonPage>
       <IonHeader>
@@ -53,6 +60,15 @@ const Exercises: NextPage = () => {
             <IonMenuButton></IonMenuButton>
           </IonButtons>
           <IonTitle>Exercises</IonTitle>
+          <IonButtons slot="end">
+            <IonButton
+              onClick={() =>
+                setCreateExerciseModalOpen(!createExerciseModalOpen)
+              }
+            >
+              <IonIcon icon={add} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -63,6 +79,10 @@ const Exercises: NextPage = () => {
         </IonHeader>
         <AllExercises />
       </IonContent>
+      <CreateExerciseModal
+        isOpen={createExerciseModalOpen}
+        setIsOpen={setCreateExerciseModalOpen}
+      />
     </IonPage>
   );
 };
