@@ -1,6 +1,5 @@
 import type { NextPage } from 'next';
 import React, { useReducer, useEffect } from 'react';
-import { IonIcon } from '@ionic/react';
 import {
   play,
   pause,
@@ -8,8 +7,19 @@ import {
   playBack,
   playForward,
   playSkipBack,
-  playSkipForward
+  playSkipForward,
+  close
 } from 'ionicons/icons';
+import {
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  IonButton,
+  IonIcon
+} from '@ionic/react';
 import {
   formatTime,
   minsFromDs,
@@ -222,7 +232,7 @@ const getColour = (
   }
 };
 
-const Timer: NextPage<TimerPropTypes> = (props) => {
+const TimerModal: NextPage<TimerPropTypes> = (props) => {
   const initialProps = {
     currentRep: 1,
     currentSet: 1,
@@ -304,93 +314,109 @@ const Timer: NextPage<TimerPropTypes> = (props) => {
   }, [state, props]);
 
   return (
-    <div className="m-1 rounded bg-neutral-900 p-2">
-      <div
-        className={`m-6 flex flex-col content-center items-center justify-center ${getColour(
-          state.activeStatus,
-          state.timerState
-        )}`}
-      >
-        <span className="text-4xl">
-          <span>
-            {state.timerState === TimerState.UNSTARTED
-              ? minsFromDs(props.repDuration * 10)
-              : minsFromDs(state.timer)}
-          </span>
-          <span>:</span>
-          <span>
-            {state.timerState === TimerState.UNSTARTED
-              ? secsFromDs(props.repDuration * 10)
-              : secsFromDs(state.timer)}
-          </span>
-          <span className="text-sm">
-            {state.timerState === TimerState.UNSTARTED
-              ? '0'
-              : decisRemaining(state.timer)}
-          </span>
-        </span>
-        <span>{renderInstruction(state.activeStatus, state.timerState)}</span>
-      </div>
-      <div className="center-items flex flex-row justify-between">
-        <span className="m-2 flex flex-row items-center rounded bg-slate-200 p-2 text-slate-900">
-          <p className="text-sm">Rep: </p>
-          {state.currentRep} / {props.reps}
-        </span>
-        <span className="m-2 flex flex-row items-center rounded bg-slate-200 p-2 text-slate-900">
-          <p className="text-sm">Set: </p>
-          {state.currentSet} / {props.sets}
-        </span>
-      </div>
-      <div className="flex flex-row justify-between">
-        <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
-          <p>Work</p>
-          {formatTime(props.repDuration)}
-        </span>
-        <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
-          <p>Rep Rest</p>
-          {formatTime(props.repsRest)}
-        </span>
-        <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
-          <p>Set Rest</p>
-          {formatTime(props.setsRest)}
-        </span>
-      </div>
-      <div className="m-2 flex flex-row justify-between">
-        <button onClick={() => dispatch({ type: 'PREV_SET' })}>
-          <IonIcon icon={playSkipBack} />
-        </button>
-        <button onClick={() => dispatch({ type: 'PREV_REP' })}>
-          <IonIcon icon={playBack} />
-        </button>
-        <button onClick={() => dispatch({ type: 'NEXT_REP' })}>
-          <IonIcon icon={playForward} />
-        </button>
-        <button onClick={() => dispatch({ type: 'NEXT_SET' })}>
-          <IonIcon icon={playSkipForward} />
-        </button>
-      </div>
-      <div className="m-2 flex flex-row justify-between">
-        <button
-          className="rounded-xl bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
-          onClick={handlePlayPause}
-        >
-          {state.timerState === TimerState.PLAYING ? (
-            <IonIcon icon={pause} />
-          ) : (
-            <IonIcon icon={play} />
-          )}
-        </button>
-        <button
-          className="rounded-xl bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
-          onClick={() =>
-            dispatch({ type: TimerActions.RESET, payload: initialProps })
-          }
-        >
-          <IonIcon icon={refresh} />
-        </button>
-      </div>
-    </div>
+    <IonModal isOpen={props.isOpen}>
+      <IonHeader>
+        <IonToolbar>
+          <IonButtons slot="end">
+            <IonButton onClick={() => props.setIsOpen(false)}>
+              <IonIcon icon={close} />
+            </IonButton>
+          </IonButtons>
+          <IonTitle>{props.title}</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
+        <div className="h-full w-full bg-neutral-900 p-2 text-white">
+          <div
+            className={`m-6 flex flex-col content-center items-center justify-center ${getColour(
+              state.activeStatus,
+              state.timerState
+            )}`}
+          >
+            <span className="text-4xl">
+              <span>
+                {state.timerState === TimerState.UNSTARTED
+                  ? minsFromDs(props.repDuration * 10)
+                  : minsFromDs(state.timer)}
+              </span>
+              <span>:</span>
+              <span>
+                {state.timerState === TimerState.UNSTARTED
+                  ? secsFromDs(props.repDuration * 10)
+                  : secsFromDs(state.timer)}
+              </span>
+              <span className="text-sm">
+                {state.timerState === TimerState.UNSTARTED
+                  ? '0'
+                  : decisRemaining(state.timer)}
+              </span>
+            </span>
+            <span>
+              {renderInstruction(state.activeStatus, state.timerState)}
+            </span>
+          </div>
+          <div className="center-items flex flex-row justify-between">
+            <span className="m-2 flex flex-row items-center rounded bg-slate-200 p-2 text-slate-900">
+              <p className="text-sm">Rep: </p>
+              {state.currentRep} / {props.reps}
+            </span>
+            <span className="m-2 flex flex-row items-center rounded bg-slate-200 p-2 text-slate-900">
+              <p className="text-sm">Set: </p>
+              {state.currentSet} / {props.sets}
+            </span>
+          </div>
+          <div className="flex flex-row justify-between">
+            <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+              <p>Work</p>
+              {formatTime(props.repDuration)}
+            </span>
+            <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+              <p>Rep Rest</p>
+              {formatTime(props.repsRest)}
+            </span>
+            <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+              <p>Set Rest</p>
+              {formatTime(props.setsRest)}
+            </span>
+          </div>
+          <div className="m-2 flex flex-row justify-between">
+            <button onClick={() => dispatch({ type: 'PREV_SET' })}>
+              <IonIcon icon={playSkipBack} />
+            </button>
+            <button onClick={() => dispatch({ type: 'PREV_REP' })}>
+              <IonIcon icon={playBack} />
+            </button>
+            <button onClick={() => dispatch({ type: 'NEXT_REP' })}>
+              <IonIcon icon={playForward} />
+            </button>
+            <button onClick={() => dispatch({ type: 'NEXT_SET' })}>
+              <IonIcon icon={playSkipForward} />
+            </button>
+          </div>
+          <div className="m-2 flex flex-row justify-between">
+            <button
+              className="rounded-xl bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
+              onClick={handlePlayPause}
+            >
+              {state.timerState === TimerState.PLAYING ? (
+                <IonIcon icon={pause} />
+              ) : (
+                <IonIcon icon={play} />
+              )}
+            </button>
+            <button
+              className="rounded-xl bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+              onClick={() =>
+                dispatch({ type: TimerActions.RESET, payload: initialProps })
+              }
+            >
+              <IonIcon icon={refresh} />
+            </button>
+          </div>
+        </div>
+      </IonContent>
+    </IonModal>
   );
 };
 
-export default Timer;
+export default TimerModal;

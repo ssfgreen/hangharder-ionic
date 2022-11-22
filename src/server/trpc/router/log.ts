@@ -65,6 +65,23 @@ export const logRouter = router({
       }
     });
   }),
+  getMyLogs: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string()
+      })
+    )
+    .query(({ ctx, input }) => {
+      return ctx.prisma.log.findMany({
+        where: {
+          userId: input.userId
+        },
+        include: {
+          user: true,
+          exercise: true
+        }
+      });
+    }),
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.log.findMany({
       select: defaultLogSelect,

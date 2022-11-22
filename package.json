@@ -24,6 +24,7 @@
     "@trpc/react-query": "10.0.0-rc.4",
     "@trpc/server": "10.0.0-rc.4",
     "autoprefixer": "^10.2.6",
+    "moment": "^2.29.4",
     "next": "^12.2.0",
     "next-auth": "^4.15.1",
     "next-transpile-modules": "^10.0.0",

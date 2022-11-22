@@ -1,7 +1,8 @@
 import type { NextPage } from 'next';
+import React, { useState } from 'react';
 import { trpc } from '../../utils/trpc';
-import Timer from './Timer';
-import Log from './Log';
+import TimerModal from './TimerModal';
+import LogModal from './LogModal';
 
 import {
   IonPage,
@@ -9,12 +10,15 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonLoading,
   IonBackButton,
-  IonButtons
+  IonButtons,
+  IonSpinner
 } from '@ionic/react';
 
 const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
+  const [logModalOpen, setLogModalOpen] = useState(false);
+  const [timerModalOpen, setTimerModalOpen] = useState(false);
+
   const {
     params: { exerciseId }
   } = match;
@@ -26,8 +30,7 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
     exercise && timerKeys.every((key) => exercise[key] !== null);
 
   return !exercise ? (
-    // <IonLoading isOpen={true}></IonLoading>
-    <div>Loading...</div>
+    <IonSpinner></IonSpinner>
   ) : (
     <IonPage>
       <IonHeader>
@@ -44,7 +47,7 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
             <IonTitle size="large">{exercise.title}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <div className="m-2 rounded border bg-neutral-800 p-2">
+        <div className="h-full w-full border bg-neutral-800 p-2 text-white">
           <div className="m-1 space-y-1">
             <header className="flex flex-row items-center space-x-2">
               <h1 className="text-xl">{exercise.title}</h1>
@@ -53,17 +56,28 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
             <p>{exercise.summary}</p>
           </div>
           {timerAvailable && (
-            <Timer
+            <TimerModal
+              title={exercise.title}
+              isOpen={timerModalOpen}
+              setIsOpen={setTimerModalOpen}
               repDuration={exercise.repDuration as number}
               reps={exercise.reps as number}
               sets={exercise.sets as number}
               repsRest={exercise.repsRest as number}
               setsRest={exercise.setsRest as number}
-            ></Timer>
+            ></TimerModal>
           )}
-          <div className="flex justify-center">
-            <Log id={exerciseId} />
-          </div>
+          <button onClick={() => setTimerModalOpen(!timerModalOpen)}>
+            Start Activity
+          </button>
+          <button onClick={() => setLogModalOpen(!logModalOpen)}>
+            Log Workout
+          </button>
+          <LogModal
+            id={exerciseId}
+            isOpen={logModalOpen}
+            setIsOpen={setLogModalOpen}
+          />
         </div>
       </IonContent>
     </IonPage>

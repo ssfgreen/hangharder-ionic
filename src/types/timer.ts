@@ -1,11 +1,14 @@
 import type { TimerActiveStatus, TimerState } from '../constants/timer';
 
 export interface TimerPropTypes {
+  title: string;
   repDuration: number;
   reps: number;
   sets: number;
   repsRest: number;
   setsRest: number;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 export interface StateTypes {

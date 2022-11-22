@@ -1,6 +1,8 @@
 import type { NextPage } from 'next';
 import { trpc } from '../../utils/trpc';
-import Exercise from './Exercise';
+import { useSession } from 'next-auth/react';
+import React, { useEffect, useState } from 'react';
+import moment from 'moment';
 
 import {
   IonPage,
@@ -14,37 +16,36 @@ import {
   IonMenuButton,
   IonSpinner
 } from '@ionic/react';
-import { useEffect } from 'react';
 
-const ExerciseEntry = (props) => (
-  <IonItem
-    routerLink={`/tabs/exercises/${props.exercise.id}`}
-    className="exercise-entry"
-  >
+const LogEntry = (props) => (
+  <IonItem>
     <IonLabel>
-      <h1>{props.exercise.title}</h1>
-      <p>{props.exercise.summary}</p>
-      <p>{props.exercise.author.name}</p>
+      <h1>{props.log.exercise.title}</h1>
+      {/* <p>{props.log.createdAt}</p> */}
+      <p>Created At: {moment(props.log.createdAt).format()}</p>
+      <p>{props.log.comment}</p>
     </IonLabel>
   </IonItem>
 );
 
-const AllExercises = () => {
-  const { data: exercises } = trpc.exercise.getAllMinimial.useQuery();
+const AllLogs = () => {
+  const { data: session } = useSession();
+  const { data: logs } = trpc.log.getMyLogs.useQuery({
+    userId: session?.user?.id as string
+  });
+
   return (
     <>
-      {!exercises ? (
+      {!logs ? (
         <IonSpinner></IonSpinner>
       ) : (
-        exercises.map((exercise, i) => (
-          <ExerciseEntry key={i} exercise={exercise} />
-        ))
+        logs.map((log, i) => <LogEntry key={i} log={log} />)
       )}
     </>
   );
 };
 
-const Exercises: NextPage = () => {
+const Logbook: NextPage = () => {
   return (
     <IonPage>
       <IonHeader>
@@ -52,19 +53,19 @@ const Exercises: NextPage = () => {
           <IonButtons slot="start">
             <IonMenuButton></IonMenuButton>
           </IonButtons>
-          <IonTitle>Exercises</IonTitle>
+          <IonTitle>LogBook</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Exercises</IonTitle>
+            <IonTitle size="large">LogBook</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <AllExercises />
+        <AllLogs />
       </IonContent>
     </IonPage>
   );
 };
 
-export default Exercises;
+export default Logbook;

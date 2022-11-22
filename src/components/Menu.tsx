@@ -58,6 +58,7 @@ const Menu = () => {
     <IonMenu
       side="start"
       contentId="main"
+      // disabled={true}
       onIonDidOpen={handleOpen}
       onIonDidClose={handleClose}
     >

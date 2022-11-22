@@ -28,13 +28,11 @@ const AppShell = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <IonSplitPane contentId="main">
-          <Menu />
-          <IonRouterOutlet id="main">
-            <Route path="/tabs" render={() => <Tabs />} />
-            <Route exact path="/" render={() => <Redirect to="/tabs" />} />
-          </IonRouterOutlet>
-        </IonSplitPane>
+        <Menu />
+        <IonRouterOutlet id="main">
+          <Route path="/tabs" render={() => <Tabs />} />
+          <Route exact path="/" render={() => <Redirect to="/tabs" />} />
+        </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
   );

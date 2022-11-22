@@ -11,6 +11,15 @@ const defaultExerciseSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   author: true
 });
 
+const minimialSelect = Prisma.validator<Prisma.ExerciseSelect>()({
+  id: true,
+  title: true,
+  summary: true,
+  createdAt: true,
+  updatedAt: true,
+  author: true
+});
+
 export const exerciseRouter = router({
   getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.exercise.findFirst({
@@ -28,6 +37,15 @@ export const exerciseRouter = router({
         id: true
       },
       where: {}
+    });
+  }),
+  getAllMinimial: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.exercise.findMany({
+      select: minimialSelect,
+      where: {},
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
   }),
   getAll: publicProcedure.query(({ ctx }) => {
