@@ -77,16 +77,16 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
           isOpen={logModalOpen}
           setIsOpen={setLogModalOpen}
         />
-        {exercise.workouts[0] && (
+        {exercise.workout && (
           <TimerModal
             title={exercise.title}
             isOpen={timerModalOpen}
             setIsOpen={setTimerModalOpen}
-            repDuration={exercise.workouts[0].repDuration as number}
-            reps={exercise.workouts[0].reps as number}
-            sets={exercise.workouts[0].sets as number}
-            repsRest={exercise.workouts[0].repsRest as number}
-            setsRest={exercise.workouts[0].setsRest as number}
+            repDuration={exercise.workout.repDuration as number}
+            reps={exercise.workout.reps as number}
+            sets={exercise.workout.sets as number}
+            repsRest={exercise.workout.repsRest as number}
+            setsRest={exercise.workout.setsRest as number}
           ></TimerModal>
         )}
       </IonContent>

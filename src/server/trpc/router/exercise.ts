@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { router, publicProcedure, protectedProcedure } from '../trpc';
 import { Prisma } from '@prisma/client';
+import { WorkOutTypesEnum } from '@/types/prismaZod';
 
 const defaultExerciseSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   id: true,
@@ -28,7 +29,7 @@ export const exerciseRouter = router({
       },
       include: {
         author: true,
-        workouts: true
+        workout: true
       }
     });
   }),
@@ -63,7 +64,16 @@ export const exerciseRouter = router({
       z.object({
         title: z.string(),
         summary: z.string(),
-        authorId: z.string()
+        description: z.string(),
+        authorId: z.string(),
+        workout: z.object({
+          authorId: z.string(),
+          type: z.enum(WorkOutTypesEnum),
+          sets: z.number(),
+          reps: z.number(),
+          setsRest: z.number(),
+          repsRest: z.number()
+        })
       })
     )
     .mutation(({ ctx, input }) => {
@@ -71,7 +81,15 @@ export const exerciseRouter = router({
         data: {
           title: input.title,
           summary: input.summary,
-          authorId: input.authorId
+          description: input.description,
+          authorId: input.authorId,
+          workout: {
+            create: input.workout
+          }
+        },
+        include: {
+          workout: true,
+          author: true
         }
       });
     })

@@ -56,9 +56,13 @@ model User {
   accounts      Account[]
   sessions      Session[]
   authoredExercises     Exercise[]  @relation("ExerciseAuthor")
+  authoredSessions      WorkoutSession[]   @relation("SessionAuthor")
   authoredWorkouts      Workout[]   @relation("WorkoutAuthor")
-  likedExercises        Exercise[]  @relation("ExerciseLiker")
-  LoggedExercises       Log[]
+  favouritedExercises   Exercise[]  @relation("ExerciseFavouriter")
+  loggedExercises       Log[]
+  followedBy     User[]      @relation("UserFollows")
+  following      User[]      @relation("UserFollows")
+  logLikes       Log[] @relation("LogLikes")
 }
 
 model VerificationToken {
@@ -85,13 +89,38 @@ model Exercise {
   image       String?
   video       String?
 
-  workouts    Workout[]
-  likedBy     User[]   @relation("ExerciseLiker")
+  workout     Workout?
+
+  favourited  User[]   @relation("ExerciseFavouriter")
   logs        Log[]
+  tags        Tag[]
+  sessions    WorkoutSession[]
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  exercises   Exercise[]
+  sessions    WorkoutSession[]
 }
 
 enum WorkOutTypes {
   TIMER
+  CLIMBER
+  REPREST
+}
+
+enum Category {
+  CONDITIONING
+  ENDURANCE
+  FLEXIBILITY
+  STRENGTH
+  TECHNIQUE
+  OPEN
+  MINDSET
+  FINGERS
+  POWER
+  OTHER
 }
 
 model Workout {
@@ -117,7 +146,7 @@ model Workout {
   video       String?
 
   exercise    Exercise @relation(fields: [exerciseId], references: [id])
-  exerciseId  String
+  exerciseId  String @unique
 }
 
 enum Level {
@@ -141,4 +170,22 @@ model Log {
   level        Level?
   comment      String?
   weight       Int?
+
+  likedBy      User[]   @relation("LogLikes")
+}
+
+model WorkoutSession {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  author       User     @relation("SessionAuthor", fields: [authorId], references: [id])
+  authorId     String
+  level        Level?
+  tags         Tag[]
+  category     Category
+  title        String
+  description  String?
+  duration     Int?
+  image        String?
+  exercises    Exercise[]
 }
