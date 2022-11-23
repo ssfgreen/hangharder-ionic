@@ -7,7 +7,9 @@ import {
   IonContent,
   IonList,
   IonToggle,
-  IonLabel
+  IonLabel,
+  IonButtons,
+  IonMenuButton
 } from '@ionic/react';
 
 import Store from '@/store';
@@ -59,6 +61,9 @@ const Settings = () => {
     <IonPage className="bg-white dark:bg-black">
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonMenuButton></IonMenuButton>
+          </IonButtons>
           <IonTitle>Settings</IonTitle>
         </IonToolbar>
       </IonHeader>

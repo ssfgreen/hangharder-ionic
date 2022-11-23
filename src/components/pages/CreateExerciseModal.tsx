@@ -61,22 +61,12 @@ type Schema = z.infer<typeof schema>;
 const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
   const { data: session } = useSession();
   const { isOpen, setIsOpen, mutation } = props;
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   control,
-  //   formState: { errors },
-  //   reset
-  // } = useForm<Schema>({
-  //   resolver: zodResolver(schema)
-  // });
 
   const methods = useForm<Schema>({
     resolver: zodResolver(schema)
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log('onSubmit', data);
     session?.user?.id &&
       props.mutation.mutate({
         title: data.title,

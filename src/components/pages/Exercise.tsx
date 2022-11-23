@@ -30,8 +30,6 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
 
   const { data: exercise } = trpc.exercise.getById.useQuery(exerciseId);
 
-  console.log(exercise);
-
   return !exercise ? (
     <IonSpinner></IonSpinner>
   ) : (
