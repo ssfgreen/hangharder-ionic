@@ -7,7 +7,7 @@ import {
   IonIcon,
   IonLabel
 } from '@ionic/react';
-import { cog, flash, list } from 'ionicons/icons';
+import { person, flash, list } from 'ionicons/icons';
 
 import Exercise from './Exercise';
 import Exercises from './Exercises';
@@ -45,9 +45,9 @@ const Tabs = () => {
           <IonIcon icon={list} />
           <IonLabel>Logbook</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab3" href="/tabs/settings" className="text-primary">
-          <IonIcon icon={cog} />
-          <IonLabel>Settings</IonLabel>
+        <IonTabButton tab="tab3" href="/tabs/profile" className="text-primary">
+          <IonIcon icon={person} />
+          <IonLabel>Profile</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>

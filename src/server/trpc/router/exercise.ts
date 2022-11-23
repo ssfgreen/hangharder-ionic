@@ -69,6 +69,7 @@ export const exerciseRouter = router({
         workout: z.object({
           authorId: z.string(),
           type: z.enum(WorkOutTypesEnum),
+          repDuration: z.number(),
           sets: z.number(),
           reps: z.number(),
           setsRest: z.number(),

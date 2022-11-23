@@ -318,7 +318,7 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <div className="h-full w-full bg-neutral-900 p-2 text-white">
+        <div className="h-full w-full p-2">
           <div
             className={`m-6 flex flex-col content-center items-center justify-center ${getColour(
               state.activeStatus,
@@ -358,15 +358,15 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
             </span>
           </div>
           <div className="flex flex-row justify-between">
-            <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+            <span className="m-2 flex flex-col items-center rounded bg-slate-100 p-2 text-xs text-slate-800">
               <p>Work</p>
               {formatTime(props.repDuration)}
             </span>
-            <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+            <span className="m-2 flex flex-col items-center rounded bg-slate-100 p-2 text-xs text-slate-800">
               <p>Rep Rest</p>
               {formatTime(props.repsRest)}
             </span>
-            <span className="m-2 flex flex-col items-center rounded bg-slate-800 p-2 text-xs text-slate-400">
+            <span className="m-2 flex flex-col items-center rounded bg-slate-100 p-2 text-xs text-slate-800">
               <p>Set Rest</p>
               {formatTime(props.setsRest)}
             </span>
@@ -385,9 +385,9 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
               <IonIcon icon={playSkipForward} />
             </button>
           </div>
-          <div className="m-2 flex flex-row justify-between">
+          <div className="m-2 flex flex-row justify-between space-x-2">
             <button
-              className="rounded-xl bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
+              className="w-1/2 rounded-xl bg-green-500 py-2 px-4 font-bold text-white hover:bg-green-700"
               onClick={handlePlayPause}
             >
               {state.timerState === TimerState.PLAYING ? (
@@ -397,7 +397,7 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
               )}
             </button>
             <button
-              className="rounded-xl bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+              className="w-1/2 rounded-xl bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
               onClick={() =>
                 dispatch({ type: TimerActions.RESET, payload: initialProps })
               }

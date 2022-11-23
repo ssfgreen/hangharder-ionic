@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import Image from 'next/image';
 import { trpc } from '@/utils/trpc';
 import { useSession } from 'next-auth/react';
 import React from 'react';
@@ -24,6 +25,7 @@ const Logbook: NextPage = () => {
     return <IonSpinner></IonSpinner>;
   }
 
+  console.log(user);
   return (
     <IonPage>
       <IonHeader>
@@ -35,7 +37,20 @@ const Logbook: NextPage = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <h1>{user && user.name}</h1>
+        <section className="flex h-full w-full flex-col items-center justify-center">
+          {user && user.image && (
+            <Image
+              className="mb-2 rounded-full"
+              src={user.image}
+              alt="logo"
+              width={100}
+              height={100}
+            ></Image>
+          )}
+          <h1 className="mb-2 text-xl">{user && user.name}</h1>
+          <p>{user && user.authoredExercises.length} Exercises Authored</p>
+          <p>{user && user.loggedExercises.length} Workouts Authored</p>
+        </section>
       </IonContent>
     </IonPage>
   );

@@ -48,7 +48,7 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
             <IonTitle size="large">{exercise.title}</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <div className="h-full w-full border bg-neutral-800 p-2 text-white">
+        <div className="h-full w-full space-y-2 border p-2">
           <div className="m-1 space-y-1">
             <header className="flex flex-row items-center space-x-2">
               <h1 className="text-xl">{exercise.title}</h1>
@@ -56,19 +56,35 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
             </header>
             <p>{exercise.summary}</p>
           </div>
-          <button onClick={() => setTimerModalOpen(!timerModalOpen)}>
-            <IonIcon icon={stopwatchOutline} />
-            Start Workout
-          </button>
-          <button onClick={() => setLogModalOpen(!logModalOpen)}>
-            <IonIcon icon={clipboardOutline} />
-            Log Workout
-          </button>
-          <button onClick={() => console.log('fav')}>
-            <IonIcon icon={starOutline} />
-            Favorite
-          </button>
-          EXERCISE OVERVIEW
+          <div className="flex flex-row justify-between">
+            <button
+              className="flex h-16 flex-col items-center justify-center rounded-md border p-2"
+              onClick={() => setTimerModalOpen(!timerModalOpen)}
+            >
+              <IonIcon icon={stopwatchOutline} />
+              Start Workout
+            </button>
+            <button
+              className="flex h-16 flex-col items-center justify-center rounded-md border p-2"
+              onClick={() => setLogModalOpen(!logModalOpen)}
+            >
+              <IonIcon icon={clipboardOutline} />
+              Log Workout
+            </button>
+            <button
+              className="flex h-16 flex-col items-center justify-center rounded-md border p-2"
+              onClick={() => console.log('fav')}
+            >
+              <IonIcon icon={starOutline} />
+              Favorite
+            </button>
+          </div>
+          {exercise.description && (
+            <>
+              <h2 className="text-lg">Description</h2>
+              <p>{exercise.description}</p>
+            </>
+          )}
         </div>
         <LogModal
           id={exerciseId}

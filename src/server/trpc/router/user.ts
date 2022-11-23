@@ -12,6 +12,10 @@ export const userRouter = router({
       return ctx.prisma.user.findFirst({
         where: {
           id: input.id
+        },
+        include: {
+          authoredExercises: true,
+          loggedExercises: true
         }
       });
     }),
