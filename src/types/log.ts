@@ -1,4 +1,4 @@
-import { Exercise, User } from '@prisma/client';
+import type { Exercise, User } from '@prisma/client';
 
 export enum Level {
   EASY,
