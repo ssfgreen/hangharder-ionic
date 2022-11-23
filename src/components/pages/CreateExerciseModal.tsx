@@ -18,6 +18,7 @@ import { useEffect } from 'react';
 interface CreateExerciseProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  mutation: (data: any) => void;
 }
 
 type Inputs = {
@@ -28,15 +29,15 @@ type Inputs = {
 
 const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
   const { data: session } = useSession();
-  const mutation = trpc.exercise.insertOne.useMutation();
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     session?.user?.id &&
-      mutation.mutate({
+      props.mutation.mutate({
         title: data.title,
         summary: data.summary,
         description: data.description,
@@ -45,10 +46,11 @@ const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
   };
 
   useEffect(() => {
-    if (mutation.isSuccess) {
+    if (props.mutation.isSuccess) {
       props.setIsOpen(false);
+      reset();
     }
-  }, [mutation.isSuccess]);
+  }, [props.mutation.isSuccess]);
 
   return (
     <IonModal isOpen={props.isOpen}>
@@ -63,60 +65,58 @@ const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {/* 
-          - Create a form with the following fields:
-          - Title
-          - Description
-          - Summary
-          - Duration
-          - Image
-        */}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <input
-            {...register('title', {
-              required: 'Title is Required',
-              minLength: {
-                value: 5,
-                message: 'Title must be at least 5 characters'
-              }
-            })}
-            placeholder="Max Hangs"
-          />
-          <p>{errors.title?.message}</p>
-          <input
-            {...register('summary', {
-              required: 'Summary is Required',
-              minLength: {
-                value: 10,
-                message: 'Summary must be at least 20 characters'
-              },
-              maxLength: {
-                value: 100,
-                message: 'Summary must be less than 100 characters'
-              }
-            })}
-            placeholder="Hang for 10 seconds at 90%"
-          />
-          <p>{errors.summary?.message}</p>
-          <textarea
-            {...register('description', {
-              required: 'Description is Required',
-              minLength: {
-                value: 20,
-                message: 'Description must be at least 20 characters'
-              }
-            })}
-            placeholder="A longer description of the exercise to explain why, how to do it"
-          />
-          <p>{errors.description?.message}</p>
-          <input type="submit" />
-        </form>
+        <div className="h-full w-full space-y-2 p-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="h-full w-full">
+            <input
+              className="mb-2 w-full rounded bg-gray-200 p-2"
+              {...register('title', {
+                required: 'Title is Required',
+                minLength: {
+                  value: 5,
+                  message: 'Title must be at least 5 characters'
+                }
+              })}
+              placeholder="Max Hangs"
+            />
+            <p>{errors.title?.message}</p>
+            <input
+              className="mb-2 w-full rounded bg-gray-200 p-2"
+              {...register('summary', {
+                required: 'Summary is Required',
+                minLength: {
+                  value: 10,
+                  message: 'Summary must be at least 20 characters'
+                },
+                maxLength: {
+                  value: 100,
+                  message: 'Summary must be less than 100 characters'
+                }
+              })}
+              placeholder="Hang for 10 seconds at 90%"
+            />
+            <p>{errors.summary?.message}</p>
+            <textarea
+              rows="4"
+              className="mb-2 w-full rounded bg-gray-200 p-2"
+              {...register('description', {
+                required: 'Description is Required',
+                minLength: {
+                  value: 20,
+                  message: 'Description must be at least 20 characters'
+                }
+              })}
+              placeholder="A longer description of the exercise to explain why, how to do it"
+            />
+            <p>{errors.description?.message}</p>
+            <input className="rounded bg-blue-400 p-2" type="submit" />
+          </form>
 
-        {mutation.error && (
-          <p className="text-red">
-            Something went wrong! {mutation.error.message}
-          </p>
-        )}
+          {props.mutation.error && (
+            <p className="text-red">
+              Something went wrong! {props.mutation.error.message}
+            </p>
+          )}
+        </div>
       </IonContent>
     </IonModal>
   );

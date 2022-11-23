@@ -13,7 +13,14 @@ import {
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { cog, flash, list, logInOutline, logOutOutline } from 'ionicons/icons';
+import {
+  cog,
+  flash,
+  list,
+  logInOutline,
+  logOutOutline,
+  person
+} from 'ionicons/icons';
 
 const Menu = () => {
   const { data: session } = useSession();
@@ -34,6 +41,11 @@ const Menu = () => {
       title: 'Settings',
       icon: cog,
       url: '/tabs/settings'
+    },
+    {
+      title: 'Profile',
+      icon: person,
+      url: '/tabs/profile'
     },
     {
       title: session?.user ? 'Logout' : 'Login',

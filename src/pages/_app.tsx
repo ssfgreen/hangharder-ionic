@@ -4,6 +4,7 @@ import { trpc } from '../utils/trpc';
 import type { AppType } from 'next/dist/shared/lib/utils';
 import { SessionProvider } from 'next-auth/react';
 import type { Session } from 'next-auth';
+import React, { useEffect, useState } from 'react';
 // import type { AppRouter } from '../server/trpc/router/_app';
 
 import 'tailwindcss/tailwind.css';
@@ -22,6 +23,28 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps }
 }) => {
+  const [theme, setTheme] = useState('');
+
+  useEffect(() => {
+    setDefaultTheme();
+  }, []);
+
+  const setDefaultTheme = () => {
+    if (
+      localStorage.theme === 'dark' ||
+      (!('theme' in localStorage) &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
+      document.documentElement.classList.add('dark');
+      setTheme('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      setTheme('light');
+    }
+  };
+
+  console.log(theme, 'theme');
+
   return (
     <SessionProvider session={session}>
       <Head>
@@ -30,7 +53,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
           content="width=device-width, initial-scale=1.0, viewport-fit=cover"
         ></meta>
       </Head>
-      <Component {...pageProps} />
+      <Component {...pageProps} theme={theme} />
       <Script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></Script>
     </SessionProvider>
   );

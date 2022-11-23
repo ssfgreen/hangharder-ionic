@@ -11,6 +11,7 @@ import { cog, flash, list, book } from 'ionicons/icons';
 
 import Exercise from './Exercise';
 import Exercises from './Exercises';
+import Profile from './Profile';
 import Logbook from './Logbook';
 import Login from './Login';
 import Settings from './Settings';
@@ -21,6 +22,7 @@ const Tabs = () => {
       <IonRouterOutlet>
         <Route path="/tabs/login" component={Login} exact={true} />
         <Route path="/tabs/exercises" component={Exercises} exact={true} />
+        <Route path="/tabs/profile" component={Profile} exact={true} />
         <Route path="/tabs/logbook" component={Logbook} exact={true} />
         <Route
           path="/tabs/exercises/:exerciseId"

@@ -1,4 +1,4 @@
-import { Store as PullStateStore } from "pullstate";
+import { Store as PullStateStore } from 'pullstate';
 
 const Store = new PullStateStore({
   safeAreaTop: 0,
@@ -8,7 +8,8 @@ const Store = new PullStateStore({
   currentPage: null,
   settings: {
     enableNotifications: true,
-  },
+    darkMode: false
+  }
 });
 
 export default Store;

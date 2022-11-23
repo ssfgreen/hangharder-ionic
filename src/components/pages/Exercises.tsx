@@ -34,8 +34,7 @@ const ExerciseEntry = (props) => (
   </IonItem>
 );
 
-const AllExercises = () => {
-  const { data: exercises } = trpc.exercise.getAllMinimial.useQuery();
+const AllExercises = ({ exercises }) => {
   return (
     <>
       {!exercises ? (
@@ -50,7 +49,17 @@ const AllExercises = () => {
 };
 
 const Exercises: NextPage = () => {
+  const [error, setError] = useState('');
   const [createExerciseModalOpen, setCreateExerciseModalOpen] = useState(false);
+  const exercises = trpc.exercise.getAllMinimial.useQuery();
+  const insertMutation = trpc.exercise.insertOne.useMutation({
+    onSuccess: () => {
+      exercises.refetch();
+    },
+    onError: (data) => {
+      setError(data.message);
+    }
+  });
 
   return (
     <IonPage>
@@ -71,17 +80,18 @@ const Exercises: NextPage = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent fullscreen className="bg-blue dark:bg-red">
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Exercises</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <AllExercises />
+        {exercises.data && <AllExercises exercises={exercises.data} />}
       </IonContent>
       <CreateExerciseModal
         isOpen={createExerciseModalOpen}
         setIsOpen={setCreateExerciseModalOpen}
+        mutation={insertMutation}
       />
     </IonPage>
   );
