@@ -1,6 +1,8 @@
 import type { NextPage } from 'next';
-import { trpc } from '../../utils/trpc';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import type { SubmitHandler, FieldValues } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useSession } from 'next-auth/react';
 import {
   IonModal,
@@ -18,24 +20,43 @@ import { useEffect } from 'react';
 interface CreateExerciseProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  mutation: (data: any) => void;
+  mutation: {
+    mutate: (data: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+    error: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    isSuccess: boolean;
+  };
 }
 
-type Inputs = {
-  title: string;
-  summary: string;
-  description: string;
-};
+const schema = z.object({
+  title: z
+    .string({
+      required_error: 'Name is required',
+      invalid_type_error: 'Name must be a string'
+    })
+    .min(5, { message: 'Must be 5 or more characters long' }),
+  summary: z
+    .string()
+    .min(5, { message: 'Must be 5 or more characters long' })
+    .max(20, { message: 'Must be less than 20 characters long' }),
+  description: z
+    .string()
+    .min(15, { message: 'Must be 15 or more characters long' })
+});
+
+type Schema = z.infer<typeof schema>;
 
 const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
   const { data: session } = useSession();
+  const { isOpen, setIsOpen, mutation } = props;
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset
-  } = useForm();
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  } = useForm<Schema>({
+    resolver: zodResolver(schema)
+  });
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     session?.user?.id &&
       props.mutation.mutate({
         title: data.title,
@@ -46,18 +67,18 @@ const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
   };
 
   useEffect(() => {
-    if (props.mutation.isSuccess) {
-      props.setIsOpen(false);
+    if (mutation.isSuccess) {
+      setIsOpen(false);
       reset();
     }
-  }, [props.mutation.isSuccess]);
+  }, [mutation.isSuccess, reset, setIsOpen]);
 
   return (
-    <IonModal isOpen={props.isOpen}>
+    <IonModal isOpen={isOpen}>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="end">
-            <IonButton onClick={() => props.setIsOpen(false)}>
+            <IonButton onClick={() => setIsOpen(false)}>
               <IonIcon icon={close} />
             </IonButton>
           </IonButtons>
@@ -69,42 +90,20 @@ const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
           <form onSubmit={handleSubmit(onSubmit)} className="h-full w-full">
             <input
               className="mb-2 w-full rounded bg-gray-200 p-2"
-              {...register('title', {
-                required: 'Title is Required',
-                minLength: {
-                  value: 5,
-                  message: 'Title must be at least 5 characters'
-                }
-              })}
+              {...register('title')}
               placeholder="Max Hangs"
             />
-            <p>{errors.title?.message}</p>
+            {errors && <p>{errors.title?.message}</p>}
             <input
               className="mb-2 w-full rounded bg-gray-200 p-2"
-              {...register('summary', {
-                required: 'Summary is Required',
-                minLength: {
-                  value: 10,
-                  message: 'Summary must be at least 20 characters'
-                },
-                maxLength: {
-                  value: 100,
-                  message: 'Summary must be less than 100 characters'
-                }
-              })}
+              {...register('summary')}
               placeholder="Hang for 10 seconds at 90%"
             />
             <p>{errors.summary?.message}</p>
             <textarea
-              rows="4"
+              rows={4}
               className="mb-2 w-full rounded bg-gray-200 p-2"
-              {...register('description', {
-                required: 'Description is Required',
-                minLength: {
-                  value: 20,
-                  message: 'Description must be at least 20 characters'
-                }
-              })}
+              {...register('description')}
               placeholder="A longer description of the exercise to explain why, how to do it"
             />
             <p>{errors.description?.message}</p>

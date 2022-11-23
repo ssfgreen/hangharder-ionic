@@ -1,6 +1,5 @@
-import type { NextPage } from 'next';
 import React, { useState } from 'react';
-import { trpc } from '../../utils/trpc';
+import { trpc } from '@/utils/trpc';
 import TimerModal from './TimerModal';
 import LogModal from './LogModal';
 
@@ -17,12 +16,9 @@ import {
 } from '@ionic/react';
 import {
   clipboardOutline,
-  heart,
-  star,
   starOutline,
   stopwatchOutline
 } from 'ionicons/icons';
-import { start } from 'repl';
 
 const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
   const [logModalOpen, setLogModalOpen] = useState(false);
@@ -33,9 +29,6 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
   } = match;
 
   const { data: exercise } = trpc.exercise.getById.useQuery(exerciseId);
-
-  const timerKeys = ['repDuration', 'reps', 'sets', 'repsRest', 'setsRest'];
-  const workoutsAvailable = exercise?.workouts?.length > 0;
 
   console.log(exercise);
 
@@ -84,7 +77,7 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
           isOpen={logModalOpen}
           setIsOpen={setLogModalOpen}
         />
-        {workoutsAvailable && (
+        {exercise.workouts[0] && (
           <TimerModal
             title={exercise.title}
             isOpen={timerModalOpen}

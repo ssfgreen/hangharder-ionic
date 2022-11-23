@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 import Image from 'next/image';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { trpc } from '../../utils/trpc';
 import {
   IonButtons,
   IonMenuButton,

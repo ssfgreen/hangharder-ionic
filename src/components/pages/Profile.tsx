@@ -1,8 +1,7 @@
 import type { NextPage } from 'next';
-import { trpc } from '../../utils/trpc';
+import { trpc } from '@/utils/trpc';
 import { useSession } from 'next-auth/react';
-import React, { useEffect, useState } from 'react';
-import moment from 'moment';
+import React from 'react';
 
 import {
   IonPage,
@@ -10,8 +9,6 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonItem,
-  IonLabel,
   IonButtons,
   IonMenuButton,
   IonSpinner

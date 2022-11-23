@@ -1,8 +1,8 @@
 import type { NextPage } from 'next';
-import { trpc } from '../../utils/trpc';
-import Exercise from './Exercise';
+import { trpc } from '@/utils/trpc';
 import React, { useState } from 'react';
 import CreateExerciseModal from './CreateExerciseModal';
+import type { ExerciseProps, ExerciseEntryProps } from '@/types/exercise';
 
 import {
   IonPage,
@@ -19,9 +19,9 @@ import {
   IonIcon
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
-import { useEffect } from 'react';
+import type { FunctionComponent } from 'react';
 
-const ExerciseEntry = (props) => (
+const ExerciseEntry: FunctionComponent<ExerciseEntryProps> = (props) => (
   <IonItem
     routerLink={`/tabs/exercises/${props.exercise.id}`}
     className="exercise-entry"
@@ -34,7 +34,7 @@ const ExerciseEntry = (props) => (
   </IonItem>
 );
 
-const AllExercises = ({ exercises }) => {
+const AllExercises: NextPage<ExerciseProps> = ({ exercises }) => {
   return (
     <>
       {!exercises ? (
@@ -49,7 +49,6 @@ const AllExercises = ({ exercises }) => {
 };
 
 const Exercises: NextPage = () => {
-  const [error, setError] = useState('');
   const [createExerciseModalOpen, setCreateExerciseModalOpen] = useState(false);
   const exercises = trpc.exercise.getAllMinimial.useQuery();
   const insertMutation = trpc.exercise.insertOne.useMutation({
@@ -57,7 +56,7 @@ const Exercises: NextPage = () => {
       exercises.refetch();
     },
     onError: (data) => {
-      setError(data.message);
+      console.log(data.message);
     }
   });
 

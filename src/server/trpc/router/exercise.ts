@@ -20,11 +20,6 @@ const minimialSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   author: true
 });
 
-interface ExerciseInsertType {
-  title: string;
-  summary: string;
-}
-
 export const exerciseRouter = router({
   getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.exercise.findFirst({

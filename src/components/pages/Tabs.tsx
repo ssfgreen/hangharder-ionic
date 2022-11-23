@@ -7,7 +7,7 @@ import {
   IonIcon,
   IonLabel
 } from '@ionic/react';
-import { cog, flash, list, book } from 'ionicons/icons';
+import { cog, flash, list } from 'ionicons/icons';
 
 import Exercise from './Exercise';
 import Exercises from './Exercises';

@@ -10,10 +10,10 @@ import {
   IonLabel
 } from '@ionic/react';
 
-import Store from '../../store';
+import Store from '@/store';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import * as selectors from '../../store/selectors';
-import { setSettings } from '../../store/actions';
+import * as selectors from '@/store/selectors';
+import { setSettings } from '@/store/actions';
 import React, { useEffect } from 'react';
 
 const Settings = () => {

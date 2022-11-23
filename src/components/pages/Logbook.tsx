@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
-import { trpc } from '../../utils/trpc';
+import { trpc } from '@/utils/trpc';
 import { useSession } from 'next-auth/react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import moment from 'moment';
 
 import {
@@ -16,8 +16,10 @@ import {
   IonMenuButton,
   IonSpinner
 } from '@ionic/react';
+import type { FunctionComponent } from 'react';
+import type { LogEntryProps } from '@/types/log';
 
-const LogEntry = (props) => (
+const LogEntry: FunctionComponent<LogEntryProps> = (props) => (
   <IonItem>
     <IonLabel>
       <h1>{props.log.exercise.title}</h1>

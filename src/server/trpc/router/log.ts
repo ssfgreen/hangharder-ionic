@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { router, publicProcedure, protectedProcedure } from '../trpc';
 import { Prisma } from '@prisma/client';
+import type { Level } from '@prisma/client';
 
 const defaultLogSelect = Prisma.validator<Prisma.LogSelect>()({
   id: true,
@@ -13,8 +14,13 @@ const defaultLogSelect = Prisma.validator<Prisma.LogSelect>()({
 interface LogInput {
   exerciseId: string;
   userId: string;
-  [key: string]: any; // allows other key/value pairs - might be another way to do this?
+  weight?: number;
+  completePec?: number;
+  comment?: string;
+  level?: Level;
 }
+
+const LevelEnum = ['EASY', 'MEDIUM', 'HARD'] as const;
 
 export const logRouter = router({
   insertOne: protectedProcedure
@@ -24,7 +30,7 @@ export const logRouter = router({
         userId: z.string(),
         weight: z.number().optional(),
         completePec: z.number().optional(),
-        level: z.number().optional(),
+        level: z.enum(LevelEnum).optional(),
         comment: z.string().optional()
       })
     )
@@ -48,7 +54,7 @@ export const logRouter = router({
       }
 
       const log = ctx.prisma.log.create({
-        data: data
+        data
       });
 
       return log;
