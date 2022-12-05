@@ -65,9 +65,7 @@ export const exerciseRouter = router({
         title: z.string(),
         summary: z.string(),
         description: z.string(),
-        authorId: z.string(),
         workout: z.object({
-          authorId: z.string(),
           type: z.enum(WorkOutTypesEnum),
           repDuration: z.number(),
           sets: z.number(),
@@ -78,14 +76,19 @@ export const exerciseRouter = router({
       })
     )
     .mutation(({ ctx, input }) => {
+      const workoutWithAuthor = {
+        ...input.workout,
+        authorId: ctx.session.user.id
+      };
+
       return ctx.prisma.exercise.create({
         data: {
           title: input.title,
           summary: input.summary,
           description: input.description,
-          authorId: input.authorId,
+          authorId: ctx.session.user.id,
           workout: {
-            create: input.workout
+            create: workoutWithAuthor
           }
         },
         include: {

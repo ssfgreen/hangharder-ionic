@@ -17,9 +17,10 @@ interface LogInput {
   exerciseId: string;
   userId: string;
   weight?: number;
-  completePec?: number;
+  completePerc?: number;
   comment?: string;
   level?: Level;
+  dateLogged: Date;
 }
 
 const LevelEnum = ['EASY', 'MEDIUM', 'HARD'] as const;
@@ -29,9 +30,9 @@ export const logRouter = router({
     .input(
       z.object({
         exerciseId: z.string(),
-        userId: z.string(),
+        dateLogged: z.date(),
         weight: z.number().optional(),
-        completePec: z.number().optional(),
+        completePerc: z.number().optional(),
         level: z.enum(LevelEnum).optional(),
         comment: z.string().optional()
       })
@@ -39,14 +40,15 @@ export const logRouter = router({
     .mutation(({ ctx, input }) => {
       const data: LogInput = {
         exerciseId: input.exerciseId,
-        userId: input.userId
+        userId: ctx.session.user.id,
+        dateLogged: input.dateLogged
       };
 
       if (input.weight) {
         data['weight'] = input.weight;
       }
-      if (input.completePec) {
-        data['completePec'] = input.completePec;
+      if (input.completePerc) {
+        data['completePerc'] = input.completePerc;
       }
       if (input.level) {
         data['level'] = input.level;
@@ -115,6 +117,9 @@ export const logRouter = router({
       },
       include: {
         user: true
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
   }),
@@ -132,6 +137,9 @@ export const logRouter = router({
         include: {
           user: true,
           exercise: true
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
       });
     }),

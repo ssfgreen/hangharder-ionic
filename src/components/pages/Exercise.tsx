@@ -97,6 +97,7 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
             isOpen={timerModalOpen}
             setIsOpen={setTimerModalOpen}
             repDuration={exercise.workout.repDuration as number}
+            setTitles={exercise.workout.setTitles as string[]}
             reps={exercise.workout.reps as number}
             sets={exercise.workout.sets as number}
             repsRest={exercise.workout.repsRest as number}

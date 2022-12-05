@@ -67,22 +67,19 @@ const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    session?.user?.id &&
-      props.mutation.mutate({
-        title: data.title,
-        summary: data.summary,
-        description: data.description,
-        authorId: session.user.id,
-        workout: {
-          type: data.type,
-          authorId: session.user.id,
-          repDuration: data.repDuration,
-          reps: data.reps,
-          sets: data.sets,
-          repsRest: data.repsRest,
-          setsRest: data.setsRest
-        }
-      });
+    props.mutation.mutate({
+      title: data.title,
+      summary: data.summary,
+      description: data.description,
+      workout: {
+        type: data.type,
+        repDuration: data.repDuration,
+        reps: data.reps,
+        sets: data.sets,
+        repsRest: data.repsRest,
+        setsRest: data.setsRest
+      }
+    });
   };
 
   useEffect(() => {

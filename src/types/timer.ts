@@ -5,6 +5,7 @@ export interface TimerPropTypes {
   repDuration: number;
   reps: number;
   sets: number;
+  setTitles: string[];
   repsRest: number;
   setsRest: number;
   isOpen: boolean;

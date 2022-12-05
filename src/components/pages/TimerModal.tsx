@@ -324,6 +324,8 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
     }
   }, [state, props]);
 
+  console.log(props, state.currentSet);
+
   return (
     <IonModal isOpen={props.isOpen}>
       <IonHeader>
@@ -371,6 +373,11 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
               <p className="text-sm">Rep: </p>
               {state.currentRep} / {props.reps}
             </span>
+            {props.setTitles && (
+              <span className="m-2 flex flex-row items-center text-lg">
+                <p>{props.setTitles[state.currentSet - 1]}</p>
+              </span>
+            )}
             <span className="m-2 flex flex-row items-center rounded bg-slate-200 p-2 text-slate-900">
               <p className="text-sm">Set: </p>
               {state.currentSet} / {props.sets}

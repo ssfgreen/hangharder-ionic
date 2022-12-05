@@ -22,6 +22,14 @@ const defaultUserSelect = Prisma.validator<Prisma.UserSelect>()({
 });
 
 export const userRouter = router({
+  getMe: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.user.findFirst({
+      select: defaultUserSelect,
+      where: {
+        id: ctx.session?.user?.id
+      }
+    });
+  }),
   getById: publicProcedure
     .input(
       z.object({
