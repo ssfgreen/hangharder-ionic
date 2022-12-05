@@ -8,7 +8,9 @@ const defaultLogSelect = Prisma.validator<Prisma.LogSelect>()({
   createdAt: true,
   updatedAt: true,
   exercise: true,
-  user: true
+  user: true,
+  comment: true,
+  likedBy: true
 });
 
 interface LogInput {
@@ -58,6 +60,53 @@ export const logRouter = router({
       });
 
       return log;
+    }),
+  likeLog: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const log = await ctx.prisma.log.findFirst({
+        where: {
+          id: input,
+          likedBy: {
+            some: {
+              id: ctx.session.user.id
+            }
+          }
+        },
+        include: {
+          likedBy: true
+        }
+      });
+
+      if (!log) {
+        const logUpdate = await ctx.prisma.log.update({
+          where: {
+            id: input
+          },
+          data: {
+            likedBy: {
+              connect: {
+                id: ctx.session.user.id
+              }
+            }
+          }
+        });
+        return logUpdate;
+      } else {
+        const logUpdate = await ctx.prisma.log.update({
+          where: {
+            id: input
+          },
+          data: {
+            likedBy: {
+              disconnect: {
+                id: ctx.session.user.id
+              }
+            }
+          }
+        });
+        return logUpdate;
+      }
     }),
   getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.log.findFirst({

@@ -234,7 +234,7 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
     reps: props.reps,
     sets: props.sets,
     repDuration: props.repDuration * 10,
-    countdown: 30
+    countdown: 50
   };
 
   const [state, dispatch] = useReducer(reducer, initialProps, init);
@@ -256,8 +256,19 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
           dispatch({ type: TimerActions.TICK });
         }
       }, 100);
+
+      if (
+        state.timer === 30 &&
+        state.activeStatus === TimerActiveStatus.COUNTDOWN
+      ) {
+        const audio = new Audio('/sounds/countdown.mp3');
+        audio.play();
+      }
+
       return () => clearInterval(interval);
     } else if (state.activeStatus === TimerActiveStatus.COUNTDOWN) {
+      const audio = new Audio('/sounds/start.mp3');
+      audio.play();
       dispatch({
         type: TimerActions.UPDATE,
         timer: props.repDuration * 10,
@@ -274,6 +285,8 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
           updateSet++;
         }
       }
+      const audio = new Audio('/sounds/start.mp3');
+      audio.play();
       dispatch({
         type: TimerActions.UPDATE,
         timer: props.repDuration * 10,
@@ -283,6 +296,8 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
       });
     } else if (state.activeStatus === TimerActiveStatus.WORK) {
       if (state.currentRep < props.reps) {
+        const audio = new Audio('/sounds/rep_complete.mp3');
+        audio.play();
         dispatch({
           type: TimerActions.UPDATE,
           timer: props.repsRest * 10,
@@ -292,12 +307,16 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
         state.currentRep === props.reps &&
         state.currentSet < props.sets
       ) {
+        const audio = new Audio('/sounds/set_complete.mp3');
+        audio.play();
         dispatch({
           type: TimerActions.UPDATE,
           timer: props.setsRest * 10,
           activeStatus: TimerActiveStatus.REST
         });
       } else {
+        const audio = new Audio('/sounds/set_complete.mp3');
+        audio.play();
         dispatch({
           type: TimerActions.FINISH
         });

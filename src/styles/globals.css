@@ -3,5 +3,12 @@
 @tailwind utilities;
 
 body {
-  @apply bg-neutral-900 text-neutral-100
+  @apply bg-neutral-900 text-neutral-100;
+  font-family: Proxima Nova, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: Proxima Nova, system-ui, sans-serif;
+  }
 }

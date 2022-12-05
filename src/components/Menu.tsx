@@ -19,7 +19,8 @@ import {
   list,
   logInOutline,
   logOutOutline,
-  person
+  person,
+  home
 } from 'ionicons/icons';
 
 const Menu = () => {
@@ -27,6 +28,11 @@ const Menu = () => {
   const [isDark, setIsDark] = useState(false);
 
   const pages = [
+    {
+      title: 'Home',
+      icon: home,
+      url: '/tabs/feed'
+    },
     {
       title: 'Exercises',
       icon: flash,

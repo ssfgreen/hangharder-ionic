@@ -2,7 +2,9 @@ import type { NextPage } from 'next';
 import { trpc } from '@/utils/trpc';
 import React, { useState } from 'react';
 import CreateExerciseModal from './CreateExerciseModal';
+import Card from '../ui/Card';
 import type { ExerciseProps, ExerciseEntryProps } from '@/types/exercise';
+import { Link } from 'react-router-dom';
 
 import {
   IonPage,
@@ -22,16 +24,13 @@ import { add } from 'ionicons/icons';
 import type { FunctionComponent } from 'react';
 
 const ExerciseEntry: FunctionComponent<ExerciseEntryProps> = (props) => (
-  <IonItem
-    routerLink={`/tabs/exercises/${props.exercise.id}`}
-    className="exercise-entry"
-  >
-    <IonLabel>
+  <Link to={`/tabs/exercises/${props.exercise.id}`}>
+    <Card className="my-4 mx-auto">
       <h1>{props.exercise.title}</h1>
       <p>{props.exercise.summary}</p>
       <p>{props.exercise.author.name}</p>
-    </IonLabel>
-  </IonItem>
+    </Card>
+  </Link>
 );
 
 const AllExercises: NextPage<ExerciseProps> = ({ exercises }) => {

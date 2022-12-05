@@ -2,6 +2,7 @@ import type { NextPage } from 'next';
 import Image from 'next/image';
 import { trpc } from '@/utils/trpc';
 import { useSession } from 'next-auth/react';
+import AllLogs from '../ui/AllLogs';
 import React from 'react';
 
 import {
@@ -15,7 +16,7 @@ import {
   IonSpinner
 } from '@ionic/react';
 
-const Logbook: NextPage = () => {
+const Profile: NextPage = () => {
   const { data: session } = useSession();
   const { data: user, isLoading } = trpc.user.getById.useQuery({
     id: session?.user?.id as string
@@ -48,12 +49,20 @@ const Logbook: NextPage = () => {
             ></Image>
           )}
           <h1 className="mb-2 text-xl">{user && user.name}</h1>
+          {user && user.description && <p>{user.description}</p>}
           <p>{user && user.authoredExercises.length} Exercises Authored</p>
           <p>{user && user.loggedExercises.length} Workouts Authored</p>
+          <section className="flex flex-row">
+            <div>Logbook</div>
+            <div>Collections</div>
+          </section>
+          <section>
+            <AllLogs />
+          </section>
         </section>
       </IonContent>
     </IonPage>
   );
 };
 
-export default Logbook;
+export default Profile;
