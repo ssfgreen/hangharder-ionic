@@ -16,7 +16,7 @@ import {
   IonIcon
 } from '@ionic/react';
 import Card from '../ui/Card';
-import { thumbsUpOutline, playOutline, chatboxOutline } from 'ionicons/icons';
+import { thumbsUpOutline, playOutline } from 'ionicons/icons';
 import { Link } from 'react-router-dom';
 import type { FunctionComponent } from 'react';
 import type { LogEntryProps } from '@/types/log';

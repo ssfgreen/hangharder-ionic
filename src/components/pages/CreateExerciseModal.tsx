@@ -9,7 +9,6 @@ import type { SubmitHandler, FieldValues } from 'react-hook-form';
 import Select from 'react-select';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useSession } from 'next-auth/react';
 import {
   IonModal,
   IonHeader,
@@ -59,7 +58,6 @@ const schema = z.object({
 type Schema = z.infer<typeof schema>;
 
 const CreateExerciseModal: NextPage<CreateExerciseProps> = (props) => {
-  const { data: session } = useSession();
   const { isOpen, setIsOpen, mutation } = props;
 
   const methods = useForm<Schema>({

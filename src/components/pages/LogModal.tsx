@@ -1,6 +1,5 @@
 import type { NextPage } from 'next';
 import { trpc } from '@/utils/trpc';
-import { Dayjs } from 'dayjs';
 import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -27,7 +26,6 @@ import {
   IonIcon
 } from '@ionic/react';
 import { close } from 'ionicons/icons';
-import { date } from 'zod';
 
 interface LogProps {
   id: string;
