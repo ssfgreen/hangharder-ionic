@@ -60,10 +60,12 @@ const FeedEntry: FunctionComponent<LogEntryProps> = (props) => {
       </h1>
       <p className="text-sm">{props.log.comment}</p>
       <section className="mb-2 flex flex-row justify-between border-b py-4">
-        <div className="flex flex-col">
-          <p className="text-xs text-slate-600">Added Weight</p>
-          <p className="text-xl">+15 kg</p>
-        </div>
+        {props.log.weight && (
+          <div className="flex flex-col">
+            <p className="text-xs text-slate-600">Added Weight</p>
+            <p className="text-xl">+15 kg</p>
+          </div>
+        )}
       </section>
       <section className="flex flex-row justify-between">
         <button onClick={handleLike} className="w-full p-2">

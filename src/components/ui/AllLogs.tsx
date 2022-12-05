@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import React from 'react';
 import moment from 'moment';
 
-import { IonItem, IonLabel, IonSpinner } from '@ionic/react';
+import { IonSpinner } from '@ionic/react';
 import Card from '../ui/Card';
 import type { FunctionComponent } from 'react';
 import type { LogEntryProps } from '@/types/log';

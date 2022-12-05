@@ -10,7 +10,8 @@ const defaultLogSelect = Prisma.validator<Prisma.LogSelect>()({
   exercise: true,
   user: true,
   comment: true,
-  likedBy: true
+  likedBy: true,
+  weight: true
 });
 
 interface LogInput {
@@ -136,7 +137,8 @@ export const logRouter = router({
         },
         include: {
           user: true,
-          exercise: true
+          exercise: true,
+          likedBy: true
         },
         orderBy: {
           createdAt: 'desc'

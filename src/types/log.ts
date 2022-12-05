@@ -12,7 +12,8 @@ type MinimalLog = {
   createdAt: Date;
   exercise: Exercise;
   user: User;
-  likedBy: User[];
+  weight: number | null;
+  likedBy: User[] | null;
 };
 
 export type LogEntryProps = {
