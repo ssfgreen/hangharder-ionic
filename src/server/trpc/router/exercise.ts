@@ -7,9 +7,12 @@ const defaultExerciseSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   id: true,
   title: true,
   summary: true,
+  description: true,
   createdAt: true,
   updatedAt: true,
-  author: true
+  author: true,
+  workout: true,
+  favourites: true
 });
 
 const minimialSelect = Prisma.validator<Prisma.ExerciseSelect>()({
@@ -21,18 +24,85 @@ const minimialSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   author: true
 });
 
+type ExerciseWithIncludedFields = Prisma.ExerciseGetPayload<{
+  include: {
+    workout: true;
+    author: true;
+    favourites: true;
+  };
+}>;
+
+type ExerciseWithFavourited = ExerciseWithIncludedFields & {
+  favourited: boolean;
+};
+
+const computeExerciseWithFavourited = (
+  exercise: ExerciseWithIncludedFields,
+  userId: string
+): ExerciseWithFavourited => {
+  const favourited =
+    exercise.favourites?.some((favourite) => favourite.userId === userId) ??
+    false;
+
+  return { ...exercise, favourited };
+};
+
 export const exerciseRouter = router({
-  getById: publicProcedure.input(z.string()).query(({ ctx, input }) => {
-    return ctx.prisma.exercise.findFirst({
+  getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const exercise = await ctx.prisma.exercise.findFirst({
       where: {
         id: input
       },
       include: {
+        workout: true,
         author: true,
-        workout: true
+        favourites: true
       }
     });
+
+    const exerciseWithFavourited = computeExerciseWithFavourited(
+      exercise,
+      ctx.session?.user?.id
+    );
+    return exerciseWithFavourited;
   }),
+  favourite: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const userFavouriteExercise =
+        await ctx.prisma.userFavouriteExercise.findFirst({
+          where: {
+            exerciseId: input,
+            userId: ctx.session.user.id
+          }
+        });
+
+      if (!userFavouriteExercise) {
+        const userFavouriteExercise =
+          await ctx.prisma.userFavouriteExercise.create({
+            data: {
+              exercise: {
+                connect: {
+                  id: input
+                }
+              },
+              user: {
+                connect: {
+                  id: ctx.session.user.id
+                }
+              }
+            }
+          });
+        return userFavouriteExercise;
+      } else {
+        const deletedUserFav = await ctx.prisma.userFavouriteExercise.delete({
+          where: {
+            id: userFavouriteExercise.id
+          }
+        });
+        return deletedUserFav;
+      }
+    }),
   getIds: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.exercise.findMany({
       select: {
@@ -51,13 +121,21 @@ export const exerciseRouter = router({
     });
   }),
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.exercise.findMany({
+    const exercises = ctx.prisma.exercise.findMany({
       select: defaultExerciseSelect,
       where: {},
       orderBy: {
         createdAt: 'desc'
       }
     });
+
+    const exercisesWithFavorite = exercises.then((exercises) => {
+      return exercises.map((exercise) =>
+        computeExerciseWithFavourited(exercise, ctx.session?.user?.id)
+      );
+    });
+
+    return exercisesWithFavorite;
   }),
   insertOne: protectedProcedure
     .input(

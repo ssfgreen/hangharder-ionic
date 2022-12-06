@@ -61,7 +61,7 @@ model User {
   authoredExercises     Exercise[]  @relation("ExerciseAuthor")
   authoredSessions      WorkoutSession[]   @relation("SessionAuthor")
   authoredWorkouts      Workout[]   @relation("WorkoutAuthor")
-  favouritedExercises   Exercise[]  @relation("ExerciseFavouriter")
+  favourites    UserFavouriteExercise[]
   loggedExercises       Log[]
   followedBy            Follows[] @relation("Following")
   following             Follows[] @relation("Follower")
@@ -114,10 +114,21 @@ model Exercise {
 
   workout     Workout?
 
-  favourited  User[]   @relation("ExerciseFavouriter")
+  favourites  UserFavouriteExercise[]
   logs        Log[]
   tags        Tag[]
   sessions    WorkoutSession[]
+}
+
+model UserFavouriteExercise {
+  id        String  @id @default(cuid())
+  exercise  Exercise @relation(fields: [exerciseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  exerciseId String
+  userId    String
+  favouritedAt DateTime @default(now())
+
+  @@unique([exerciseId, userId])
 }
 
 model Tag {

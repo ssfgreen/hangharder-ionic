@@ -11,7 +11,7 @@ import {
   FormProvider,
   useFormContext
 } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { SubmitHandler, FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -43,14 +43,22 @@ const schema = z.object({
 type Schema = z.infer<typeof schema>;
 
 const LogModal: NextPage<LogProps> = (props) => {
+  const { setIsOpen } = props;
+
   const mutation = trpc.log.insertOne.useMutation();
 
   const methods = useForm<Schema>({
     resolver: zodResolver(schema)
   });
 
+  useEffect(() => {
+    if (mutation.isSuccess) {
+      setIsOpen(false);
+      methods.reset();
+    }
+  }, [mutation.isSuccess, methods, setIsOpen]);
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log('data', data);
     const mutationObj = {
       exerciseId: props.id,
       dateLogged: data.dateLogged,
@@ -79,7 +87,11 @@ const LogModal: NextPage<LogProps> = (props) => {
             className="my-4 mx-auto h-full w-3/4"
           >
             <NestedInput />
-            <input className="rounded bg-blue-400 p-2" type="submit" />
+            <input
+              className="cursor-pointer rounded bg-blue-400 p-2 text-white"
+              type="submit"
+              value="Log Exercise"
+            />
           </form>
         </FormProvider>
       </IonContent>
@@ -93,8 +105,6 @@ const NestedInput = () => {
     control,
     formState: { errors }
   } = useFormContext<Schema>();
-
-  console.log('errors', errors);
 
   const [reqDate, setreqDate] = useState(new Date());
 
@@ -132,22 +142,6 @@ const NestedInput = () => {
           )}
         />
       </section>
-      <section className="my-2 flex flex-col">
-        <label>Comment</label>
-        <Controller
-          render={({ field }) => <TextField {...field} />}
-          name="comment"
-          control={control}
-        />
-      </section>
-      <section className="my-2">
-        <label>Weight Added / Removed</label>
-        <input
-          type="number"
-          className="w-full rounded border-[0.4px] border-black/70 bg-transparent p-2"
-          {...register('weight', { valueAsNumber: true })}
-        />
-      </section>
       <section className="my-2">
         <label>Percent Completed</label>
         <Controller
@@ -164,6 +158,23 @@ const NestedInput = () => {
               step={10}
             />
           )}
+        />
+      </section>
+      <section className="my-2">
+        <label>Weight Added / Removed</label>
+        <input
+          type="number"
+          defaultValue={0}
+          className="w-full rounded border-[0.4px] border-black/70 bg-transparent p-2"
+          {...register('weight', { valueAsNumber: true })}
+        />
+      </section>
+      <section className="my-2 flex flex-col">
+        <label>Comment</label>
+        <Controller
+          render={({ field }) => <TextField {...field} />}
+          name="comment"
+          control={control}
         />
       </section>
     </div>

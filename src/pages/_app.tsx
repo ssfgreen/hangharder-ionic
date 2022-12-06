@@ -43,7 +43,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }
   };
 
-  console.log(theme, 'theme');
+  // console.log(theme, 'theme');
 
   return (
     <SessionProvider session={session}>

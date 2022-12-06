@@ -38,7 +38,7 @@ const Settings = () => {
   };
 
   const handleChangeTheme = (theme: string) => {
-    console.log('changing theme', theme);
+    // console.log('changing theme', theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {

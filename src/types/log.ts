@@ -13,9 +13,12 @@ type MinimalLog = {
   exercise: Exercise;
   user: User;
   weight: number | null;
-  likedBy: User[] | null;
+  likedBy: User[] | { id: string }[] | null;
 };
 
 export type LogEntryProps = {
   log: MinimalLog;
+  mutation: {
+    mutate: (data: string) => void;
+  };
 };

@@ -324,8 +324,6 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
     }
   }, [state, props]);
 
-  console.log(props, state.currentSet);
-
   return (
     <IonModal isOpen={props.isOpen}>
       <IonHeader>

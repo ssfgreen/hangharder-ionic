@@ -47,7 +47,8 @@ const AllExercises: NextPage<ExerciseProps> = ({ exercises }) => {
 
 const Exercises: NextPage = () => {
   const [createExerciseModalOpen, setCreateExerciseModalOpen] = useState(false);
-  const exercises = trpc.exercise.getAllMinimial.useQuery();
+  const exercises = trpc.exercise.getAll.useQuery();
+
   const insertMutation = trpc.exercise.insertOne.useMutation({
     onSuccess: () => {
       exercises.refetch();

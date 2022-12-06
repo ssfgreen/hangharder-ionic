@@ -26,7 +26,6 @@ const Profile: NextPage = () => {
     return <IonSpinner></IonSpinner>;
   }
 
-  console.log(user);
   return (
     <IonPage>
       <IonHeader>
@@ -38,15 +37,17 @@ const Profile: NextPage = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <section className="flex h-full w-full flex-col items-center justify-center">
+        <section className="flex h-full w-full flex-col items-center overflow-auto">
           {user && user.image && (
-            <Image
-              className="mb-2 rounded-full"
-              src={user.image}
-              alt="logo"
-              width={100}
-              height={100}
-            ></Image>
+            <div className="h-20 w-20 rounded-full">
+              <Image
+                className="mb-2 rounded-full"
+                src={user.image}
+                alt="logo"
+                width={100}
+                height={100}
+              ></Image>
+            </div>
           )}
           <h1 className="mb-2 text-xl">{user && user.name}</h1>
           {user && user.description && <p>{user.description}</p>}

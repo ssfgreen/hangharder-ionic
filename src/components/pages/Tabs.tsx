@@ -9,7 +9,7 @@ import {
 } from '@ionic/react';
 import { person, flash, list, home } from 'ionicons/icons';
 
-import Exercise from './Exercise';
+import Exercise from '../Exercise/pages/Exercise';
 import Exercises from './Exercises';
 import Profile from './Profile';
 import Logbook from './Logbook';

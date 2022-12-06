@@ -92,6 +92,9 @@ export const logRouter = router({
                 id: ctx.session.user.id
               }
             }
+          },
+          include: {
+            likedBy: true
           }
         });
         return logUpdate;
@@ -106,6 +109,9 @@ export const logRouter = router({
                 id: ctx.session.user.id
               }
             }
+          },
+          include: {
+            likedBy: true
           }
         });
         return logUpdate;
@@ -146,17 +152,12 @@ export const logRouter = router({
       });
     }),
   getMyLogsByExercise: protectedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        exerciseId: z.string()
-      })
-    )
+    .input(z.string())
     .query(({ ctx, input }) => {
       return ctx.prisma.log.findMany({
         where: {
-          userId: input.userId,
-          exerciseId: input.exerciseId
+          userId: ctx.session.user.id,
+          exerciseId: input
         },
         include: {
           user: true,

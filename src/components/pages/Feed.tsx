@@ -3,6 +3,8 @@ import { trpc } from '@/utils/trpc';
 import React from 'react';
 import moment from 'moment';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import type { User } from '@prisma/client';
 
 import {
   IonPage,
@@ -21,15 +23,9 @@ import { Link } from 'react-router-dom';
 import type { FunctionComponent } from 'react';
 import type { LogEntryProps } from '@/types/log';
 
-moment().calendar(null, {
-  sameElse: 'MMMM Do YYYY, h:mm a'
-});
-
 const FeedEntry: FunctionComponent<LogEntryProps> = (props) => {
-  const mutation = trpc.log.likeLog.useMutation();
-
   const handleLike = async () => {
-    mutation.mutate(props.log.id);
+    props.mutation.mutate(props.log.id);
   };
 
   return (
@@ -63,7 +59,10 @@ const FeedEntry: FunctionComponent<LogEntryProps> = (props) => {
         {props.log.weight && (
           <div className="flex flex-col">
             <p className="text-xs text-slate-600">Added Weight</p>
-            <p className="text-xl">+15 kg</p>
+            <p className="text-xl">
+              {props.log.weight > 0 ? '+' : '-'}
+              {props.log.weight} kg
+            </p>
           </div>
         )}
       </section>
@@ -87,15 +86,73 @@ const FeedEntry: FunctionComponent<LogEntryProps> = (props) => {
 
 const AllPosts = () => {
   const { data: logs } = trpc.log.getAll.useQuery(); // replace with log.getMyFeed which gets friends etc
+  const { data: session } = useSession();
+  const utils = trpc.useContext();
+  const mutation = trpc.log.likeLog.useMutation({
+    onMutate: async (logId) => {
+      // cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await utils.log.getAll.invalidate();
 
-  console.log(logs);
+      // create optimistic update
+      const previousLogs = logs;
+      const optimisticUpdate = previousLogs?.map((log) => {
+        if (log.id === logId) {
+          if (
+            log?.likedBy?.length > 0 &&
+            log.likedBy.filter((user) => user.id === session?.user?.id).length >
+              0
+          ) {
+            const removedUserLog = {
+              ...log,
+              likedBy: log.likedBy.filter(
+                (user) => user.id !== session?.user?.id
+              )
+            };
+            return removedUserLog;
+          } else {
+            return {
+              ...log,
+              likedBy: [
+                ...(log.likedBy || []),
+                {
+                  id: session?.user?.id,
+                  name: session?.user?.name
+                } as User // not sure if this is allowed?
+              ]
+            };
+          }
+        }
+        return log;
+      });
+
+      // update the cache
+      utils.log.getAll.setData(optimisticUpdate);
+
+      // return a context object with the snapshotted value
+      return { optimisticUpdate };
+    },
+    onSuccess: async (data) => {
+      utils.log.getAll.setData((prev) => {
+        return prev?.map((log) => {
+          if (log.id === data.id) {
+            return { ...log, likedBy: data.likedBy };
+          }
+          return log;
+        });
+      });
+    },
+    onError: (err) => {
+      console.log('err', err);
+    }
+  });
+
   return (
     <>
       {!logs ? (
         <IonSpinner></IonSpinner>
       ) : (
         logs.map((log, i) => {
-          return <FeedEntry key={i} log={log} />;
+          return <FeedEntry key={i} log={log} mutation={mutation} />;
         })
       )}
     </>
