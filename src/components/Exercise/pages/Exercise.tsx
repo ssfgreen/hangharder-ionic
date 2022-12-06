@@ -151,6 +151,7 @@ const Exercise = ({ match }: { match: { params: { exerciseId: string } } }) => {
           <TimerModal
             title={exercise.title}
             isOpen={timerModalOpen}
+            setLogModalOpen={setLogModalOpen}
             setIsOpen={setTimerModalOpen}
             repDuration={exercise.workout.repDuration as number}
             setTitles={exercise.workout.setTitles as string[]}
