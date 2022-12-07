@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import {
   play,
   pause,
@@ -28,6 +28,7 @@ import {
 } from '@/utils/timer';
 import { TimerActiveStatus, TimerState, TimerActions } from '@/constants/timer';
 import type { TimerPropTypes, StateTypes, ActionTypes } from '@/types/timer';
+import { useWakeLock } from '@/utils/useWakeLock';
 
 const init = (initialProps: StateTypes): StateTypes => {
   return {
@@ -224,6 +225,13 @@ const getColour = (
   }
 };
 
+interface Log {
+  type: 'info' | 'request' | 'release' | 'error';
+  message: string;
+}
+
+const addLog = (log: Log, logs: Log[]) => [log, ...logs];
+
 const TimerModal: NextPage<TimerPropTypes> = (props) => {
   const initialProps = {
     currentRep: 1,
@@ -238,14 +246,37 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
   };
 
   const [state, dispatch] = useReducer(reducer, initialProps, init);
+  const [wakeLock, setWakeLock] = useState(false);
+  const [logs, setLogs] = useState<Log[]>([
+    { type: 'info', message: 'click to toggle between request and release' }
+  ]);
+  const { isSupported, request, release } = useWakeLock({
+    onRequest: () =>
+      setLogs((l) =>
+        addLog({ type: 'request', message: 'Wake Lock is active!' }, l)
+      ),
+    onError: () =>
+      setLogs((l) =>
+        addLog({ type: 'error', message: 'An error happened' }, l)
+      ),
+    onRelease: () => {
+      handleWakelock(false);
+      setLogs((l) =>
+        addLog({ type: 'release', message: 'Wake Lock was released!' }, l)
+      );
+    }
+  });
 
   const handlePlayPause = () => {
     if (state.timerState === TimerState.UNSTARTED) {
       dispatch({ type: TimerActions.START });
+      handleWakelock(true);
     } else if (state.timerState === TimerState.PLAYING) {
       dispatch({ type: TimerActions.PAUSE });
+      handleWakelock(false);
     } else if (state.timerState === TimerState.PAUSED) {
       dispatch({ type: TimerActions.RESUME });
+      handleWakelock(true);
     }
   };
 
@@ -320,16 +351,39 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
         dispatch({
           type: TimerActions.FINISH
         });
+        console.log('finish');
+        handleWakelock(false);
       }
     }
   }, [state, props]);
 
+  const handleWakelock = (updateWakeLock: boolean) => {
+    if (isSupported) {
+      if (updateWakeLock) {
+        request();
+        setWakeLock(true);
+      } else {
+        release();
+        setWakeLock(false);
+      }
+    }
+  };
+
+  const handleClose = () => {
+    if (state.timerState === TimerState.PLAYING) {
+      dispatch({ type: TimerActions.PAUSE });
+    }
+    if (wakeLock) {
+      handleWakelock(false);
+    }
+    props.setIsOpen(false);
+  };
   return (
-    <IonModal isOpen={props.isOpen}>
+    <IonModal isOpen={props.isOpen} onDidDismiss={() => handleClose()}>
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="end">
-            <IonButton onClick={() => props.setIsOpen(false)}>
+            <IonButton onClick={handleClose}>
               <IonIcon icon={close} />
             </IonButton>
           </IonButtons>
@@ -395,6 +449,7 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
               {formatTime(props.setsRest)}
             </span>
           </div>
+
           <div className="m-2 flex flex-row justify-between">
             <button onClick={() => dispatch({ type: 'PREV_SET' })}>
               <IonIcon icon={playSkipBack} />
@@ -422,9 +477,10 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
             </button>
             <button
               className="w-1/2 rounded-xl bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
-              onClick={() =>
-                dispatch({ type: TimerActions.RESET, payload: initialProps })
-              }
+              onClick={() => {
+                dispatch({ type: TimerActions.RESET, payload: initialProps });
+                handleWakelock(false);
+              }}
             >
               <IonIcon icon={refresh} />
             </button>

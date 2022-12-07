@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { trpc } from '@/utils/trpc';
-import TimerModal from '../../pages/TimerModal';
+import TimerModal from '../TimerModal';
 import LogModal from '../../pages/LogModal';
 import moment from 'moment';
 
