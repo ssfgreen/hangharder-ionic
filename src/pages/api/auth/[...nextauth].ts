@@ -10,14 +10,45 @@ import { prisma } from '../../../server/db/client';
 import * as bcrypt from 'bcrypt';
 
 export const authOptions: NextAuthOptions = {
+  pages: {
+    signIn: '/tabs/login',
+    error: '/tabs/login'
+  },
+  session: {
+    // Set to jwt in order to CredentialsProvider works properly
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60 // 30 days
+  },
   // Include user.id on session
   callbacks: {
-    session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
-      }
+    // async jwt({ token, user }) {
+    //   if (user) {
+    //     token.id = user.id;
+    //   }
+    //   return token;
+    // },
+    // async session({ session, user, token }) {
+    //   if (session.user) {
+    //     session.user.id = user.id;
+    //   }
+    //   return session;
+    // }
+    jwt: async ({ token, user }) => {
+      user && (token.user = user);
+
+      return token;
+    },
+    session: async ({ session, token }: any) => {
+      session.user = token.user; // Setting token in session
+
       return session;
     }
+    // session({ session, user }) {
+    //   if (session.user) {
+    //     session.user.id = user.id;
+    //   }
+    //   return session;
+    // }
   },
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
@@ -37,7 +68,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         const { email, password } = credentials as {
           email: string;
           password: string;
@@ -48,6 +79,7 @@ export const authOptions: NextAuthOptions = {
         if (user && user.password) {
           const result = await bcrypt.compare(password, user.password);
           if (result) {
+            console.log('user', user);
             return user;
           }
         }
