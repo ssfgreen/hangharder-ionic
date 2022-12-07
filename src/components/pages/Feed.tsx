@@ -21,9 +21,9 @@ import Card from '../ui/Card';
 import { thumbsUpOutline, playOutline } from 'ionicons/icons';
 import { Link } from 'react-router-dom';
 import type { FunctionComponent } from 'react';
-import type { LogEntryProps } from '@/types/log';
+import type { LogEntryWithMutationProps } from '@/types/log';
 
-const FeedEntry: FunctionComponent<LogEntryProps> = (props) => {
+const FeedEntry: FunctionComponent<LogEntryWithMutationProps> = (props) => {
   const handleLike = async () => {
     props.mutation.mutate(props.log.id);
   };

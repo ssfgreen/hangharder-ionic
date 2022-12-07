@@ -1,4 +1,4 @@
-import { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.hangharder.app',
@@ -10,7 +10,10 @@ const config: CapacitorConfig = {
       launchShowDuration: 0
     }
   },
-  cordova: {}
+  cordova: {},
+  server: {
+    url: 'http://192.168.1.176:3000'
+  }
 };
 
 export default config;

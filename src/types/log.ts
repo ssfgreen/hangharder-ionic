@@ -18,6 +18,10 @@ type MinimalLog = {
 
 export type LogEntryProps = {
   log: MinimalLog;
+};
+
+export type LogEntryWithMutationProps = {
+  log: MinimalLog;
   mutation: {
     mutate: (data: string) => void;
   };

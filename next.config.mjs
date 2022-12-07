@@ -16,12 +16,12 @@ const withTM = withTmInitializer([
 
 /** @type {import("next").NextConfig} */
 const config = {
+  basePath: '',
+  publicRuntimeConfig: {
+    NODE_ENV: process.env.NODE_ENV
+  },
   reactStrictMode: true,
   swcMinify: true,
-  i18n: {
-    locales: ['en'],
-    defaultLocale: 'en'
-  },
   images: {
     remotePatterns: [
       {
