@@ -351,7 +351,6 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
         dispatch({
           type: TimerActions.FINISH
         });
-        console.log('finish');
         handleWakelock(false);
       }
     }

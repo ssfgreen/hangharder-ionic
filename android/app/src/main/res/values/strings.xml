@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">hangharder</string>
+    <string name="title_activity_main">hangharder</string>
+    <string name="package_name">com.hangharder.app</string>
+    <string name="custom_url_scheme">com.hangharder.app</string>
+</resources>

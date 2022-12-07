@@ -76,7 +76,6 @@ const Exercises: NextPage = () => {
           )
         );
       } else {
-        console.log('exercises', exercises);
         setResults(exercises);
       }
     }
@@ -101,7 +100,6 @@ const Exercises: NextPage = () => {
   };
 
   const handleFilterFavourites = () => {
-    console.log('filter favourites');
     setFilterFavourites(!filterFavourites);
   };
 

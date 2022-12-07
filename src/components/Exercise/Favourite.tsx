@@ -21,13 +21,15 @@ const Favorite = ({
       const origExercise = utils.exercise.getById.getData(exerciseId);
 
       // modify cache to reflect optimistic update
-      utils.exercise.getById.setData(exerciseId, {
-        ...origExercise,
-        favourited: origExercise && !origExercise?.favourited
-      });
-
-      // // return snapshot of previous value incase of failure
-      // return { origExercise };
+      if (origExercise) {
+        utils.exercise.getById.setData(
+          {
+            ...origExercise,
+            favourited: !origExercise?.favourited
+          },
+          exerciseId
+        );
+      }
     },
     onSuccess: () => {
       utils.exercise.getById.invalidate();
