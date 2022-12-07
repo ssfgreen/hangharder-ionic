@@ -15,7 +15,6 @@ import { useForm } from 'react-hook-form';
 import { logoGoogle, logoDiscord, logOutOutline } from 'ionicons/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { string } from 'zod';
 
 const schema = z.object({
   // name: z.string().min(5, { message: 'Must be 5 or more characters long' }),

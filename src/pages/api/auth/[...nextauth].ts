@@ -19,36 +19,18 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60 // 30 days
   },
-  // Include user.id on session
   callbacks: {
-    // async jwt({ token, user }) {
-    //   if (user) {
-    //     token.id = user.id;
-    //   }
-    //   return token;
-    // },
-    // async session({ session, user, token }) {
-    //   if (session.user) {
-    //     session.user.id = user.id;
-    //   }
-    //   return session;
-    // }
     jwt: async ({ token, user }) => {
       user && (token.user = user);
 
       return token;
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     session: async ({ session, token }: any) => {
       session.user = token.user; // Setting token in session
 
       return session;
     }
-    // session({ session, user }) {
-    //   if (session.user) {
-    //     session.user.id = user.id;
-    //   }
-    //   return session;
-    // }
   },
   // Configure one or more authentication providers
   adapter: PrismaAdapter(prisma),
