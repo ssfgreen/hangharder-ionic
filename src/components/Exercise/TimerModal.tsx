@@ -280,6 +280,18 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
     }
   };
 
+  const handleWakelock = (updateWakeLock: boolean) => {
+    if (isSupported) {
+      if (updateWakeLock) {
+        request();
+        setWakeLock(true);
+      } else {
+        release();
+        setWakeLock(false);
+      }
+    }
+  };
+
   useEffect(() => {
     if (state.timer > 0) {
       const interval = setInterval(() => {
@@ -355,18 +367,6 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
       }
     }
   }, [state, props]);
-
-  const handleWakelock = (updateWakeLock: boolean) => {
-    if (isSupported) {
-      if (updateWakeLock) {
-        request();
-        setWakeLock(true);
-      } else {
-        release();
-        setWakeLock(false);
-      }
-    }
-  };
 
   const handleClose = () => {
     if (state.timerState === TimerState.PLAYING) {

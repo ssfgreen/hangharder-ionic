@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { trpc } from '@/utils/trpc';
 import { IonIcon } from '@ionic/react';
 import { starOutline, star } from 'ionicons/icons';
-import type { ExerciseWithFavourited } from '@/types/exercise';
 
 const Favorite = ({
   exerciseId,
