@@ -10,6 +10,7 @@ export interface TimerPropTypes {
   setsRest: number;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  setLogModalOpen: (isOpen: boolean) => void;
 }
 
 export interface StateTypes {

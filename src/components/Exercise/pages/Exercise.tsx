@@ -15,12 +15,7 @@ import {
   IonSpinner,
   IonIcon
 } from '@ionic/react';
-import {
-  clipboardOutline,
-  starOutline,
-  stopwatchOutline,
-  star
-} from 'ionicons/icons';
+import { clipboardOutline, stopwatchOutline } from 'ionicons/icons';
 import Favorite from '../Favourite';
 
 const MyLogs = ({ exerciseId }: { exerciseId: string }) => {

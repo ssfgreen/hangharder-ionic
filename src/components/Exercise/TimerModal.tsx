@@ -378,6 +378,7 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
     }
     props.setIsOpen(false);
   };
+
   return (
     <IonModal isOpen={props.isOpen} onDidDismiss={() => handleClose()}>
       <IonHeader>
@@ -485,6 +486,8 @@ const TimerModal: NextPage<TimerPropTypes> = (props) => {
               <IonIcon icon={refresh} />
             </button>
           </div>
+          <div>{wakeLock ? 'wakelock active' : 'wakelock inactive'}</div>
+          <div>{'wakeLock' in navigator ? 'available' : 'not available'}</div>
         </div>
       </IonContent>
     </IonModal>

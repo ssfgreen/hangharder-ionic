@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { trpc } from '@/utils/trpc';
 import { IonIcon } from '@ionic/react';
 import { starOutline, star } from 'ionicons/icons';
+import type { ExerciseWithFavourited } from '@/types/exercise';
 
 const Favorite = ({
   exerciseId,
@@ -14,27 +15,25 @@ const Favorite = ({
   const favouriteMutation = trpc.exercise.favourite.useMutation({
     onMutate: async (exerciseId) => {
       // stop any outgoing refetches (so they don't overwrite our optimistic update)
-      utils.exercise.getById.cancel(exerciseId);
+      await utils.exercise.getById.cancel(exerciseId);
 
       // get snapshot of current value
-      const snapshotOfPreviousExercise =
-        utils.exercise.getById.getData(exerciseId);
+      const origExercise = utils.exercise.getById.getData(exerciseId);
 
       // modify cache to reflect optimistic update
       utils.exercise.getById.setData(exerciseId, {
-        ...snapshotOfPreviousExercise,
-        favourite: !snapshotOfPreviousExercise?.favourited
+        ...origExercise,
+        favourited: origExercise && !origExercise?.favourited
       });
 
-      // return snapshot of previous value incase of failure
-      return { snapshotOfPreviousExercise };
+      // // return snapshot of previous value incase of failure
+      // return { origExercise };
     },
     onSuccess: () => {
       utils.exercise.getById.invalidate();
-      // utils.exercise.getById.setData(data);
     },
-    onError: (err, exerciseId, { snapshotOfPreviousExercise }) => {
-      utils.exercise.getById.setData(exerciseId, snapshotOfPreviousExercise);
+    onError: (err, exerciseId) => {
+      utils.exercise.getById.refetch(exerciseId);
     }
   });
 

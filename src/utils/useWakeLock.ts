@@ -14,7 +14,7 @@ export interface WakeLockSentinel extends EventTarget {
   type: WakeLockType;
   released: boolean;
   release: () => Promise<void>;
-  onrelease: React.EventHandler<Event>;
+  onrelease: React.EventHandler<any>; // TODO: Solve ANY!
 }
 
 export const useWakeLock = ({
@@ -43,7 +43,8 @@ export const useWakeLock = ({
       }
 
       try {
-        wakeLock.current = await navigator.wakeLock.request(type);
+        const anyNav: any = navigator; // TODO: Solve ANY!
+        wakeLock.current = await anyNav.wakeLock.request(type);
 
         if (wakeLock?.current) {
           wakeLock.current.onrelease = (e: Event) => {

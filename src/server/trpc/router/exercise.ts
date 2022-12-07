@@ -2,6 +2,10 @@ import { z } from 'zod';
 import { router, publicProcedure, protectedProcedure } from '../trpc';
 import { Prisma } from '@prisma/client';
 import { WorkOutTypesEnum } from '@/types/prismaZod';
+import type {
+  ExerciseWithIncludedFields,
+  ExerciseWithFavourited
+} from '@/types/exercise';
 
 const defaultExerciseSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   id: true,
@@ -12,7 +16,11 @@ const defaultExerciseSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   updatedAt: true,
   author: true,
   workout: true,
-  favourites: true
+  favourites: true,
+  duration: true,
+  authorId: true,
+  image: true,
+  video: true
 });
 
 const minimialSelect = Prisma.validator<Prisma.ExerciseSelect>()({
@@ -23,18 +31,6 @@ const minimialSelect = Prisma.validator<Prisma.ExerciseSelect>()({
   updatedAt: true,
   author: true
 });
-
-type ExerciseWithIncludedFields = Prisma.ExerciseGetPayload<{
-  include: {
-    workout: true;
-    author: true;
-    favourites: true;
-  };
-}>;
-
-type ExerciseWithFavourited = ExerciseWithIncludedFields & {
-  favourited: boolean;
-};
 
 const computeExerciseWithFavourited = (
   exercise: ExerciseWithIncludedFields,
@@ -60,44 +56,42 @@ export const exerciseRouter = router({
       }
     });
 
-    const exerciseWithFavourited = computeExerciseWithFavourited(
-      exercise,
-      ctx.session?.user?.id
-    );
+    const exerciseWithFavourited =
+      exercise &&
+      ctx.session?.user?.id &&
+      computeExerciseWithFavourited(exercise, ctx.session?.user?.id);
     return exerciseWithFavourited;
   }),
   favourite: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      const userFavouriteExercise =
-        await ctx.prisma.userFavouriteExercise.findFirst({
-          where: {
-            exerciseId: input,
-            userId: ctx.session.user.id
-          }
-        });
+      const exerciseWithFav = await ctx.prisma.userFavouriteExercise.findFirst({
+        where: {
+          exerciseId: input,
+          userId: ctx.session.user.id
+        }
+      });
 
-      if (!userFavouriteExercise) {
-        const userFavouriteExercise =
-          await ctx.prisma.userFavouriteExercise.create({
-            data: {
-              exercise: {
-                connect: {
-                  id: input
-                }
-              },
-              user: {
-                connect: {
-                  id: ctx.session.user.id
-                }
+      if (!exerciseWithFav) {
+        const exerciseWithFav = await ctx.prisma.userFavouriteExercise.create({
+          data: {
+            exercise: {
+              connect: {
+                id: input
+              }
+            },
+            user: {
+              connect: {
+                id: ctx.session.user.id
               }
             }
-          });
-        return userFavouriteExercise;
+          }
+        });
+        return exerciseWithFav;
       } else {
         const deletedUserFav = await ctx.prisma.userFavouriteExercise.delete({
           where: {
-            id: userFavouriteExercise.id
+            id: exerciseWithFav.id
           }
         });
         return deletedUserFav;
@@ -129,11 +123,16 @@ export const exerciseRouter = router({
       }
     });
 
-    const exercisesWithFavorite = exercises.then((exercises) => {
-      return exercises.map((exercise) =>
-        computeExerciseWithFavourited(exercise, ctx.session?.user?.id)
-      );
-    });
+    const exercisesWithFavorite = exercises.then(
+      (exercises): ExerciseWithFavourited[] => {
+        return exercises.map((exercise) => {
+          return computeExerciseWithFavourited(
+            exercise,
+            ctx.session?.user?.id || '' // this catches if a user is not logged in, will return all false
+          );
+        });
+      }
+    );
 
     return exercisesWithFavorite;
   }),

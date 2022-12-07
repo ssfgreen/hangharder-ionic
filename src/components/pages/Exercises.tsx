@@ -3,7 +3,11 @@ import { trpc } from '@/utils/trpc';
 import React, { useEffect, useState } from 'react';
 import CreateExerciseModal from './CreateExerciseModal';
 import Card from '../ui/Card';
-import type { ExerciseProps, ExerciseEntryProps } from '@/types/exercise';
+import type {
+  ExerciseProps,
+  ExerciseEntryProps,
+  ExerciseWithFavourited
+} from '@/types/exercise';
 import { Link } from 'react-router-dom';
 
 import {
@@ -49,32 +53,40 @@ const AllExercises: NextPage<ExerciseProps> = ({ exercises }) => {
 
 const Exercises: NextPage = () => {
   const [createExerciseModalOpen, setCreateExerciseModalOpen] = useState(false);
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<ExerciseWithFavourited[]>([]);
   const [searchText, setSearchText] = useState('');
   const [filterFavourites, setFilterFavourites] = useState(false);
+  const utils = trpc.useContext();
   const { data: exercises } = trpc.exercise.getAll.useQuery();
 
   useEffect(() => {
-    if (filterFavourites) {
-      setResults(
-        exercises.filter(
-          (exercise) =>
-            exercise.favourited &&
-            exercise.title.toLowerCase().indexOf(searchText) > -1
-        )
-      );
-    } else if (searchText.length > 0) {
-      setResults(
-        exercises.filter((d) => d.title.toLowerCase().indexOf(searchText) > -1)
-      );
-    } else {
-      setResults(exercises);
+    if (exercises && exercises.length > 0) {
+      if (filterFavourites) {
+        setResults(
+          exercises.filter(
+            (exercise) =>
+              exercise.favourited &&
+              exercise.title?.toLowerCase().indexOf(searchText) > -1
+          )
+        );
+      } else if (searchText.length > 0) {
+        setResults(
+          exercises.filter(
+            (exercise) => exercise.title.toLowerCase().indexOf(searchText) > -1
+          )
+        );
+      } else {
+        console.log('exercises', exercises);
+        setResults(exercises);
+      }
     }
   }, [filterFavourites, searchText, exercises]);
 
   const insertMutation = trpc.exercise.insertOne.useMutation({
     onSuccess: () => {
-      exercises.refetch();
+      if (exercises) {
+        utils.exercise.getAll.refetch();
+      }
     },
     onError: (data) => {
       console.log(data.message);
